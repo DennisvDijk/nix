@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ./services/sketchybar.nix
     ./programs/starship.nix
     ./programs/zsh.nix
     ./programs/chromium.nix
@@ -32,6 +31,17 @@
   # Aerospace window manager configuration
   home.file.".aerospace.toml" = lib.homeManager.mkStoreOutOfSymlink {
     source = ../config/aerospace.toml;
+  };
+
+  # Sketchybar configuration files
+  home.file.".config/sketchybar/sketchybarrc" = lib.homeManager.mkStoreOutOfSymlink {
+    source = ../config/sketchybar/sketchybarrc;
+    executable = true;
+  };
+  
+  home.file.".config/sketchybar/workspace_update.sh" = lib.homeManager.mkStoreOutOfSymlink {
+    source = ../config/sketchybar/workspace_update.sh;
+    executable = true;
   };
 
   # Core packages

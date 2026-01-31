@@ -5,7 +5,7 @@
     enable = true;
     package = pkgs.brave;
     extensions = [
-      { id = "cjpalhdlnbpafiamejdnhcphjbkeiagm"; } # ublock origin
+      { id = "ddkjiahejlhfcafbddmgiahcphecmpfh"; } # ublock origin
     ];
     commandLineArgs = [
       "--disable-features=WebRtcAllowInputVolumeAdjustment"

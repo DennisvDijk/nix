@@ -4,15 +4,8 @@
   environment.systemPackages = with pkgs; [
     sketchybar
   ];
-
-  # Sketchybar configuration files using mkStoreOutOfSymlink
-  home.file.".config/sketchybar/sketchybarrc" = lib.homeManager.mkStoreOutOfSymlink {
-    source = ../../../config/sketchybar/sketchybarrc;
-    executable = true;
-  };
   
-  home.file.".config/sketchybar/workspace_update.sh" = lib.homeManager.mkStoreOutOfSymlink {
-    source = ../../../config/sketchybar/workspace_update.sh;
-    executable = true;
-  };
+  # Note: SketchyBar should be launched manually or via login items
+  # launchd integration has been removed due to compatibility issues
+  # See: https://github.com/FelixKratz/SketchyBar/issues/553
 }

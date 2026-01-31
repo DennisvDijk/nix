@@ -13,49 +13,25 @@
   };
 
   outputs = { self, nixpkgs, nix-darwin, home-manager, flake-utils, ... }@inputs:
-  flake-utils.lib.eachDefaultSystem (system:
-    let
-      username = "dennisvandijk";
-      
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
+  {
+    darwinConfigurations = builtins.listToAttrs (map (hostName: {
+      name = hostName;
+      value = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
+        specialArgs = { username = "dennisvandijk"; };
+        modules = [ ./hosts/${hostName}/darwin.nix ];
       };
+    }) [ "work" "personal" ]);
 
-      # Helper to create a darwin configuration for a host
-      mkDarwinConfig = hostName: nix-darwin.lib.darwinSystem {
-        inherit system;
-        specialArgs = { inherit username; };
-        modules = [
-          # Host-specific darwin config (contains all settings)
-          ./hosts/${hostName}/darwin.nix
-          # Home Manager integration
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.${username} = import ./hosts/${hostName}/home.nix;
-          }
-        ];
-      };
-
-    in
-    {
-      darwinConfigurations = {
-        work = mkDarwinConfig "work";
-        personal = mkDarwinConfig "personal";
-      };
-
-      homeConfigurations = {
-        work = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./hosts/work/home.nix ];
+    homeConfigurations = builtins.listToAttrs (map (hostName: {
+      name = hostName;
+      value = home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs { 
+          system = "aarch64-darwin";
+          config.allowUnfree = true;
         };
-        personal = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./hosts/personal/home.nix ];
-        };
+        modules = [ ./hosts/${hostName}/home.nix ];
       };
-    }
-  );
+    }) [ "work" "personal" ]);
+  };
 }
