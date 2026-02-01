@@ -24,25 +24,19 @@
   '';
 
   # OpenCode configuration
-  home.file.".config/opencode/opencode.json" = lib.homeManager.mkStoreOutOfSymlink {
-    source = ../config/opencode/opencode.json;
-  };
+  home.file.".config/opencode/opencode.json".source = config.lib.file.mkOutOfStoreSymlink
+    "${config.home.homeDirectory}/.config/nix/modules/config/opencode/opencode.json";
 
   # Aerospace window manager configuration
-  home.file.".aerospace.toml" = lib.homeManager.mkStoreOutOfSymlink {
-    source = ../config/aerospace.toml;
-  };
+  home.file.".aerospace.toml".source = config.lib.file.mkOutOfStoreSymlink
+    "${config.home.homeDirectory}/.config/nix/modules/config/aerospace.toml";
 
   # Sketchybar configuration files
-  home.file.".config/sketchybar/sketchybarrc" = lib.homeManager.mkStoreOutOfSymlink {
-    source = ../config/sketchybar/sketchybarrc;
-    executable = true;
-  };
+  home.file.".config/sketchybar/sketchybarrc".source = config.lib.file.mkOutOfStoreSymlink
+    "${config.home.homeDirectory}/.config/nix/modules/config/sketchybar/sketchybarrc";
   
-  home.file.".config/sketchybar/workspace_update.sh" = lib.homeManager.mkStoreOutOfSymlink {
-    source = ../config/sketchybar/workspace_update.sh;
-    executable = true;
-  };
+  home.file.".config/sketchybar/workspace_update.sh".source = config.lib.file.mkOutOfStoreSymlink
+    "${config.home.homeDirectory}/.config/nix/modules/config/sketchybar/workspace_update.sh";
 
   # Core packages
   home.packages = with pkgs; [
