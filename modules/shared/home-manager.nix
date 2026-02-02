@@ -91,5 +91,8 @@
     codex
     aider-chat
     gemini-cli
+
+    # k8s
+    kubectl
   ];
 }
