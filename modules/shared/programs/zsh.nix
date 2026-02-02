@@ -5,6 +5,10 @@
     enable = true;
     enableCompletion = true;
     
+    sessionVariables = {
+      PATH = "/opt/homebrew/bin:/opt/homebrew/sbin:$PATH";
+    };
+    
     history = {
       size = 10000;
       share = true;

@@ -10,9 +10,17 @@
     
     # Add flake-utils for better flake patterns
     flake-utils.url = "github:numtide/flake-utils";
+    
+    # OpenClaw - AI assistant gateway
+    nix-openclaw.url = "github:openclaw/nix-openclaw";
+    nix-openclaw.inputs.nixpkgs.follows = "nixpkgs";
+    
+    # sops-nix for secret management
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, flake-utils, ... }@inputs:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, flake-utils, nix-openclaw, sops-nix, ... }@inputs:
   {
     darwinConfigurations = builtins.listToAttrs (map (hostName: {
       name = hostName;
@@ -30,7 +38,11 @@
           system = "aarch64-darwin";
           config.allowUnfree = true;
         };
-        modules = [ ./hosts/${hostName}/home.nix ];
+        extraSpecialArgs = { inherit inputs; };
+        modules = [ 
+          ./hosts/${hostName}/home.nix
+          sops-nix.homeManagerModules.sops
+        ];
       };
     }) [ "work" "personal" ]);
   };

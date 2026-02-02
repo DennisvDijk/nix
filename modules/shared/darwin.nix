@@ -19,7 +19,7 @@
     };
     
     # Homebrew CLI tools (formulae)
-    brews = with pkgs; [
+    brews = [
       "ffmpeg"
       "supabase/tap/supabase"
       "yt-dlp"
@@ -69,6 +69,7 @@
     sketchybar
     wezterm
     alacritty  # Migrated from Homebrew
+    k9s
   ];
 
   # Default: show macOS menu bar
