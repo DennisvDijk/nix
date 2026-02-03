@@ -30,13 +30,12 @@
       launchd.enable = false;  # Disabled - using custom launchd agent below to control KeepAlive behavior
 
       # Gateway configuration
+      # LET OP: De auth token wordt via environment variable gezet (niet hier!)
+      # Zie de launchd agent EnvironmentVariables hieronder
       config = {
         gateway = {
           mode = "local";
-          auth = {
-            mode = "token";
-            token = "openclaw-gateway-token-change-me";
-          };
+          # Auth config wordt runtime ingelezen uit secret file
         };
       };
 
@@ -113,6 +112,8 @@
         OPENCLAW_CONFIG_PATH = "${config.home.homeDirectory}/.openclaw/openclaw.json";
         OPENCLAW_STATE_DIR = "${config.home.homeDirectory}/.openclaw";
         OPENCLAW_NIX_MODE = "1";
+        # Gateway token uit sops-nix secrets (runtime decrypt)
+        OPENCLAW_GATEWAY_TOKEN_FILE = config.sops.secrets.openclaw_api_key.path;
         MOLTBOT_CONFIG_PATH = "${config.home.homeDirectory}/.openclaw/openclaw.json";
         MOLTBOT_STATE_DIR = "${config.home.homeDirectory}/.openclaw";
         MOLTBOT_NIX_MODE = "1";

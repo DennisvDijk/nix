@@ -16,8 +16,11 @@
     
     # Definieer welke secrets je wilt gebruiken
     secrets = {
-      # Dit maakt het secret beschikbaar via: config.sops.secrets.openclaw_api_key.path
-      openclaw_api_key = {};
+      # OpenClaw API key uit apart secrets bestand
+      openclaw_api_key = {
+        sopsFile = ../../secrets/openclaw.yaml;
+        key = "openclaw_api_key";
+      };
       
       # Je kunt ook andere secrets toevoegen:
       # database_password = {};
