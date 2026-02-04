@@ -84,17 +84,17 @@ in
       echo "OpenClaw documents synced"
     fi
     
-    # Clone and build OpenClaw Docker image if not present
+    # Clone and build OpenClaw Docker image (controlled by OPENCLAW_BUILD_IMAGE env var)
     if command -v docker >/dev/null 2>&1; then
-      if ! docker image inspect openclaw:local >/dev/null 2>&1; then
-        echo "Building OpenClaw Docker image..."
+      if [ "''${OPENCLAW_BUILD_IMAGE:-}" = "1" ] || [ "''${OPENCLAW_BUILD_IMAGE:-}" = "true" ]; then
+        echo "OPENCLAW_BUILD_IMAGE is set - rebuilding OpenClaw Docker image..."
         
-        # Clone repository if not exists
+        # Clone repository if not exists, otherwise update
         if [ ! -d "$OPENCLAW_SRC" ]; then
           echo "Cloning OpenClaw repository..."
           ${pkgs.git}/bin/git clone https://github.com/openclaw/openclaw.git "$OPENCLAW_SRC"
         else
-          # Update existing clone
+          echo "Updating existing OpenClaw repository..."
           cd "$OPENCLAW_SRC" && ${pkgs.git}/bin/git pull origin main
         fi
         
@@ -102,14 +102,18 @@ in
         cd "$OPENCLAW_SRC"
         docker build -t openclaw:local -f "$OPENCLAW_SRC/Dockerfile" "$OPENCLAW_SRC"
         echo "OpenClaw Docker image built successfully"
+      elif ! docker image inspect openclaw:local >/dev/null 2>&1; then
+        echo "OpenClaw Docker image not found. To build it, run:"
+        echo "  OPENCLAW_BUILD_IMAGE=1 home-manager switch --flake .#personal"
+        echo ""
+        echo "Or build manually:"
+        echo "  git clone https://github.com/openclaw/openclaw.git ~/.local/share/openclaw-src"
+        echo "  cd ~/.local/share/openclaw-src && docker build -t openclaw:local ."
       else
-        echo "OpenClaw Docker image already exists"
+        echo "OpenClaw Docker image exists (set OPENCLAW_BUILD_IMAGE=1 to rebuild)"
       fi
     else
       echo "Note: Docker not available in activation, skipping image build"
-      echo "Run this manually to build the image:"
-      echo "  git clone https://github.com/openclaw/openclaw.git ~/.local/share/openclaw-src"
-      echo "  cd ~/.local/share/openclaw-src && docker build -t openclaw:local ."
     fi
     
     # Create .env file with token from sops
@@ -155,6 +159,9 @@ EOF
     alias oc-channels="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli channels"
     alias oc-agents="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli agents"
     alias oc-tools="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli tools"
+    
+    # Image rebuild alias
+    alias oc-rebuild="echo 'Run: OPENCLAW_BUILD_IMAGE=1 home-manager switch --flake .#personal'"
     
     export PERSONAL_ENV=1
     export NIX_HOST="personal"
