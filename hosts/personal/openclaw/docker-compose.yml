@@ -1,6 +1,6 @@
 services:
   openclaw-gateway:
-    image: openclaw/openclaw:${OPENCLAW_VERSION:-latest}
+    image: openclaw:local
     container_name: openclaw-gateway
     restart: unless-stopped
     
@@ -54,7 +54,7 @@ services:
       start_period: 10s
 
   openclaw-cli:
-    image: openclaw/openclaw:${OPENCLAW_VERSION:-latest}
+    image: openclaw:local
     container_name: openclaw-cli
     restart: "no"
     

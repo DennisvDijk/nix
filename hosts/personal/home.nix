@@ -30,11 +30,13 @@ in
         sopsFile = ../../secrets/openclaw.yaml;
         key = "telegram_chat_id";
       };
-      gemini_api_key = {
-        sopsFile = ../../secrets/openclaw.yaml;
-        key = "gemini_api_key";
-      };
     };
+    
+    # Optional secrets - uncomment after adding to secrets/openclaw.yaml
+    # gemini_api_key = {
+    #   sopsFile = ../../secrets/openclaw.yaml;
+    #   key = "gemini_api_key";
+    # };
   };
 
   # Personal-specific packages
@@ -43,6 +45,8 @@ in
     imagemagick
     docker
     docker-compose
+    sops
+    age
   ];
 
   # OpenClaw Docker Compose setup
@@ -63,11 +67,14 @@ in
     ".secrets/.keep".text = "";
   };
 
-  # Copy documents and setup secrets
+  # Copy documents, build image, and setup secrets
   home.activation.setupOpenclaw = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    export PATH="${pkgs.docker}/bin:$PATH"
+    
     OPENCLAW_DIR="${openclawDir}"
     WORKSPACE_DIR="${config.home.homeDirectory}/.openclaw/workspace"
     DOC_DIR="${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw/documents"
+    OPENCLAW_SRC="${config.home.homeDirectory}/.local/share/openclaw-src"
     
     mkdir -p "$WORKSPACE_DIR"
     
@@ -75,6 +82,34 @@ in
     if [ -d "$DOC_DIR" ]; then
       cp -f "$DOC_DIR/"*.md "$WORKSPACE_DIR/" 2>/dev/null || true
       echo "OpenClaw documents synced"
+    fi
+    
+    # Clone and build OpenClaw Docker image if not present
+    if command -v docker >/dev/null 2>&1; then
+      if ! docker image inspect openclaw:local >/dev/null 2>&1; then
+        echo "Building OpenClaw Docker image..."
+        
+        # Clone repository if not exists
+        if [ ! -d "$OPENCLAW_SRC" ]; then
+          echo "Cloning OpenClaw repository..."
+          ${pkgs.git}/bin/git clone https://github.com/openclaw/openclaw.git "$OPENCLAW_SRC"
+        else
+          # Update existing clone
+          cd "$OPENCLAW_SRC" && ${pkgs.git}/bin/git pull origin main
+        fi
+        
+        # Build Docker image
+        cd "$OPENCLAW_SRC"
+        docker build -t openclaw:local -f "$OPENCLAW_SRC/Dockerfile" "$OPENCLAW_SRC"
+        echo "OpenClaw Docker image built successfully"
+      else
+        echo "OpenClaw Docker image already exists"
+      fi
+    else
+      echo "Note: Docker not available in activation, skipping image build"
+      echo "Run this manually to build the image:"
+      echo "  git clone https://github.com/openclaw/openclaw.git ~/.local/share/openclaw-src"
+      echo "  cd ~/.local/share/openclaw-src && docker build -t openclaw:local ."
     fi
     
     # Create .env file with token from sops
@@ -95,25 +130,11 @@ EOF
       echo "Warning: OpenClaw API key not found, .env not created"
     fi
     
-    # Setup Gemini API key
-    GEMINI_KEY_FILE="${config.sops.secrets.gemini_api_key.path}"
-    if [ -f "$GEMINI_KEY_FILE" ]; then
-      cp "$GEMINI_KEY_FILE" "${config.home.homeDirectory}/.openclaw/gemini-key"
-      chmod 600 "${config.home.homeDirectory}/.openclaw/gemini-key"
-      echo "Gemini API key configured"
-    else
-      echo "Warning: Gemini API key not found in secrets"
-    fi
-    
-    # Setup Telegram bot token
-    TELEGRAM_TOKEN_FILE="${config.sops.secrets.telegram_bot_token.path}"
-    if [ -f "$TELEGRAM_TOKEN_FILE" ]; then
-      cp "$TELEGRAM_TOKEN_FILE" "${config.home.homeDirectory}/.openclaw/telegram-token"
-      chmod 600 "${config.home.homeDirectory}/.openclaw/telegram-token"
-      echo "Telegram bot token configured"
-    else
-      echo "Warning: Telegram bot token not found in secrets"
-    fi
+    # Setup optional secrets (manual step after adding to secrets/openclaw.yaml)
+    # To enable Gemini and Telegram, add these keys to secrets/openclaw.yaml:
+    #   gemini_api_key: your-key-here
+    #   telegram_bot_token: your-token-here
+    # Then uncomment the secrets above and rebuild
   '';
 
   # Zsh aliases for Docker-based OpenClaw
