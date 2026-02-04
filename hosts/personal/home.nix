@@ -145,20 +145,21 @@ EOF
   programs.zsh.initContent = lib.mkAfter ''
     export OPENCLAW_DIR="${openclawDir}"
     
-    # OpenClaw Docker aliases - Gateway
+    # OpenClaw Docker aliases - Gateway management
     alias oc-up="cd $OPENCLAW_DIR && docker compose up -d"
     alias oc-down="cd $OPENCLAW_DIR && docker compose down"
     alias oc-logs="cd $OPENCLAW_DIR && docker compose logs -f openclaw-gateway"
     alias oc-ps="cd $OPENCLAW_DIR && docker compose ps"
-    alias oc-exec="cd $OPENCLAW_DIR && docker compose exec openclaw-gateway"
+    alias oc-shell="cd $OPENCLAW_DIR && docker compose exec openclaw-gateway /bin/sh"
     alias oc-health='curl -s http://localhost:18789/health | jq'
     
-    # OpenClaw CLI aliases
-    alias oc-cli="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli"
+    # OpenClaw CLI aliases - Use these for openclaw commands
+    alias oc="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli"
     alias oc-onboard="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli onboard"
     alias oc-channels="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli channels"
     alias oc-agents="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli agents"
     alias oc-tools="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli tools"
+    alias oc-status="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli status"
     
     # Image rebuild alias
     alias oc-rebuild="echo 'Run: OPENCLAW_BUILD_IMAGE=1 home-manager switch --flake .#personal'"
