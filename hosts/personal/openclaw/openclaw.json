@@ -1,0 +1,55 @@
+{
+  "gateway": {
+    "mode": "local",
+    "port": 18789,
+    "auth": {
+      "mode": "token"
+    }
+  },
+  "logging": {
+    "redactSensitive": "tools",
+    "redactPatterns": ["GEMINI_API_KEY", "OPENCLAW_GATEWAY_TOKEN"]
+  },
+  "models": {
+    "providers": [
+      {
+        "id": "google-gemini",
+        "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+        "auth": {
+          "type": "apiKey",
+          "apiKeyFile": "/home/node/.openclaw/gemini-key"
+        },
+        "models": [
+          {
+            "id": "google/gemini-3-pro-preview",
+            "name": "gemini-3-pro-preview"
+          }
+        ]
+      }
+    ]
+  },
+  "agents": {
+    "defaults": {
+      "sandbox": {
+        "mode": "all",
+        "scope": "agent"
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "workspace": "/home/node/.openclaw/workspace",
+        "tools": {
+          "allow": ["read", "write", "web_search"],
+          "deny": ["exec", "process", "browser"]
+        }
+      }
+    ]
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botTokenFile": "/home/node/.openclaw/telegram-token"
+    }
+  }
+}

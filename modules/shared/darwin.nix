@@ -53,6 +53,7 @@
       "llamabarn"
       "wave"
       "parsec"
+      "stats"
       "blender"
     ];
   };
@@ -70,6 +71,8 @@
     wezterm
     alacritty  # Migrated from Homebrew
     k9s
+    telegram-desktop
+    gnupg
   ];
 
   # Default: show macOS menu bar

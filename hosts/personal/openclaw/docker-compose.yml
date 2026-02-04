@@ -1,0 +1,94 @@
+services:
+  openclaw-gateway:
+    image: openclaw/openclaw:${OPENCLAW_VERSION:-latest}
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    read_only: true
+    user: "1000:1000"
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Networking - bind to localhost only for security
+    ports:
+      - "127.0.0.1:${OPENCLAW_GATEWAY_PORT:-18789}:${OPENCLAW_GATEWAY_PORT:-18789}"
+    networks:
+      - openclaw-network
+    
+    # Volumes - read-only where possible
+    volumes:
+      - ${OPENCLAW_CONFIG_DIR:-~/.openclaw}:/home/node/.openclaw:rw
+      - ${OPENCLAW_WORKSPACE_DIR:-~/.openclaw/workspace}:/home/node/.openclaw/workspace:rw
+      - /tmp:/tmp:rw
+    
+    # Environment
+    environment:
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
+      - OPENCLAW_GATEWAY_PORT=${OPENCLAW_GATEWAY_PORT:-18789}
+      - OPENCLAW_GATEWAY_BIND=${OPENCLAW_GATEWAY_BIND:-loopback}
+      - NODE_ENV=production
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "node", "dist/index.js", "health", "--token", "${OPENCLAW_GATEWAY_TOKEN}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  openclaw-cli:
+    image: openclaw/openclaw:${OPENCLAW_VERSION:-latest}
+    container_name: openclaw-cli
+    restart: "no"
+    
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    read_only: true
+    user: "1000:1000"
+    
+    # Same volumes as gateway
+    volumes:
+      - ${OPENCLAW_CONFIG_DIR:-~/.openclaw}:/home/node/.openclaw:rw
+      - ${OPENCLAW_WORKSPACE_DIR:-~/.openclaw/workspace}:/home/node/.openclaw/workspace:rw
+    
+    # Environment
+    environment:
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
+      - OPENCLAW_GATEWAY_URL=http://openclaw-gateway:${OPENCLAW_GATEWAY_PORT:-18789}
+      - NODE_ENV=production
+    
+    # CLI runs and exits, no daemon
+    command: ["echo", "CLI ready - use: docker compose run --rm openclaw-cli <command>"]
+    networks:
+      - openclaw-network
+    profiles:
+      - cli
+
+networks:
+  openclaw-network:
+    driver: bridge
+    internal: false
