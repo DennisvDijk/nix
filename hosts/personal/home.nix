@@ -57,15 +57,21 @@ in
     # Environment file template
     ".config/openclaw/.env.example".source = ./openclaw/.env.example;
     
-    # OpenClaw config
-    ".openclaw/openclaw.json" = {
-      force = true;
-      text = builtins.readFile ./openclaw/openclaw.json;
-    };
-    
     # Secrets placeholder
     ".secrets/.keep".text = "";
   };
+  
+  # Copy config file to .openclaw (regular file for Docker compatibility)
+  home.activation.copyOpenclawConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    mkdir -p "${config.home.homeDirectory}/.openclaw"
+    # Remove old symlink if it exists
+    if [ -L "${config.home.homeDirectory}/.openclaw/openclaw.json" ]; then
+      rm -f "${config.home.homeDirectory}/.openclaw/openclaw.json"
+    fi
+    cp -f "${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw/openclaw.json" \
+      "${config.home.homeDirectory}/.openclaw/openclaw.json"
+    chmod 644 "${config.home.homeDirectory}/.openclaw/openclaw.json"
+  '';
 
   # Copy documents, build image, and setup secrets
   home.activation.setupOpenclaw = lib.hm.dag.entryAfter ["writeBoundary"] ''
@@ -116,20 +122,35 @@ in
       echo "Note: Docker not available in activation, skipping image build"
     fi
     
-    # Create .env file with token from sops
+    # Create .env file with all tokens from sops (SOPS still encrypts these!)
     TOKEN_FILE="${config.sops.secrets.openclaw_api_key.path}"
     if [ -f "$TOKEN_FILE" ]; then
       TOKEN=$(cat "$TOKEN_FILE")
+      
+      # Get Gemini key if available
+      GEMINI_KEY=""
+      if [ -f "${config.sops.secrets.gemini_api_key.path}" ] 2>/dev/null; then
+        GEMINI_KEY=$(cat "${config.sops.secrets.gemini_api_key.path}" 2>/dev/null || echo "")
+      fi
+      
+      # Get Telegram token if available
+      TELEGRAM_TOKEN=""
+      if [ -f "${config.sops.secrets.telegram_bot_token.path}" ] 2>/dev/null; then
+        TELEGRAM_TOKEN=$(cat "${config.sops.secrets.telegram_bot_token.path}" 2>/dev/null || echo "")
+      fi
+      
       cat > "$OPENCLAW_DIR/.env" << EOF
 OPENCLAW_VERSION=latest
 OPENCLAW_GATEWAY_PORT=18789
-OPENCLAW_GATEWAY_BIND=loopback
+OPENCLAW_GATEWAY_BIND=0.0.0.0
 OPENCLAW_CONFIG_DIR=${config.home.homeDirectory}/.openclaw
 OPENCLAW_WORKSPACE_DIR=${config.home.homeDirectory}/.openclaw/workspace
 OPENCLAW_GATEWAY_TOKEN=$TOKEN
+GEMINI_API_KEY=$GEMINI_KEY
+TELEGRAM_BOT_TOKEN=$TELEGRAM_TOKEN
 EOF
       chmod 600 "$OPENCLAW_DIR/.env"
-      echo "OpenClaw environment configured"
+      echo "OpenClaw environment configured with SOPS-encrypted secrets"
     else
       echo "Warning: OpenClaw API key not found, .env not created"
     fi
