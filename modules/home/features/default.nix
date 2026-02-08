@@ -14,6 +14,7 @@
     ./ai.nix
     ./terminal.nix
     ./nh.nix
+    ./openclaw.nix
   ];
   
   # Global feature options
