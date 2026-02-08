@@ -1,3 +1,6 @@
+# hosts/personal/home.nix
+# Personal host home configuration using feature flags
+
 { config, pkgs, lib, inputs, ... }:
 
 let
@@ -5,10 +8,95 @@ let
 in
 {
   imports = [
-    ../../modules/shared/home-manager.nix
+    ../../modules/home/features  # Import all feature modules
   ];
 
-  # SOPS configuration for secret management
+  # Host-specific identity
+  home.username = "dennisvandijk";
+  home.homeDirectory = "/Users/dennisvandijk";
+  home.stateVersion = "25.05";
+
+  # Enable Home Manager
+  programs.home-manager.enable = true;
+
+  # Feature flags configuration
+  my.features = {
+    # Core (enabled by default)
+    shell = {
+      enable = true;
+      starship.enable = true;
+      direnv.enable = true;
+      zoxide.enable = true;
+      atuin.enable = true;
+    };
+    
+    cli.enable = true;
+    
+    git = {
+      enable = true;
+      userName = "Dennis van Dijk";
+      userEmail = "dennis@thenextgen.nl";
+      delta.enable = true;
+      lazygit.enable = true;
+      jujutsu.enable = true;
+      githubCli.enable = true;
+    };
+    
+    terminal = {
+      enable = true;
+      wezterm.enable = true;
+      alacritty.enable = true;
+      kitty.enable = false;
+      iterm2.enable = true;
+    };
+    
+    # nh configuration
+    nh = {
+      enable = true;
+      flakeDir = "${config.home.homeDirectory}/.config/nix";
+      defaultDarwinHost = "personal";
+    };
+    
+    # Personal-specific features
+    dev = {
+      enable = true;
+      docker.enable = true;
+      node.enable = true;
+      python.enable = true;
+      http.enable = true;
+    };
+    
+    k8s = {
+      enable = true;
+      kubectl.enable = true;
+      k9s.enable = true;
+      helm.enable = false;  # Not needed for personal
+      operators.enable = false;
+      cloud.enable = false;
+    };
+    
+    ai = {
+      enable = true;
+      codingAssistants.enable = true;
+      llmTools.enable = true;
+      localLLMs.enable = true;
+    };
+  };
+
+  # User identity configuration (stored in secrets/user.yaml)
+  # These are personal identifiers, not sensitive secrets
+  my.user = {
+    fullName = "Dennis van Dijk";
+    firstName = "Dennis";
+    lastName = "van Dijk";
+    email.personal = "dennis@thenextgen.nl";
+    email.git = "dennis@thenextgen.nl";
+    email.work = "";
+    username = "dennisvandijk";
+    homeDirectory = "/Users/dennisvandijk";
+  };
+
+  # SOPS configuration for secret management (API keys, tokens, passwords)
   sops = {
     age.keyFile = "/Users/dennisvandijk/Library/Application Support/sops/age/keys.txt";
     defaultSopsFile = ../../secrets/example.yaml;
@@ -31,71 +119,72 @@ in
         key = "telegram_chat_id";
       };
     };
-    
-    # Optional secrets - uncomment after adding to secrets/openclaw.yaml
-    # gemini_api_key = {
-    #   sopsFile = ../../secrets/openclaw.yaml;
-    #   key = "gemini_api_key";
-    # };
   };
 
-  # Personal-specific packages
+  # LM Studio configuration
+  home.sessionPath = [
+    "${config.home.homeDirectory}/.lmstudio/bin"
+  ];
+
+  home.file.".config/lm-studio/config.json".text = lib.mkForce ''
+    {
+      "bootstrappedByHomeManager": true
+    }
+  '';
+
+  # Personal-specific packages (things not covered by features)
   home.packages = with pkgs; [
+    # Media tools (personal-specific)
     ffmpeg
     imagemagick
-    docker
-    docker-compose
+    
+    # Secrets management
     sops
     age
   ];
 
   # OpenClaw Docker Compose setup
   home.file = {
-    # Docker compose file
     ".config/openclaw/docker-compose.yml".source = ./openclaw/docker-compose.yml;
-    
-    # Environment file template
     ".config/openclaw/.env.example".source = ./openclaw/.env.example;
-    
-    # Secrets placeholder
     ".secrets/.keep".text = "";
+    
+    ".openclaw/openclaw.json" = {
+      force = true;
+      source = config.lib.file.mkOutOfStoreSymlink 
+        "${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw/openclaw.json";
+    };
   };
   
-  # Copy config file to .openclaw (regular file for Docker compatibility)
-  home.activation.copyOpenclawConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    mkdir -p "${config.home.homeDirectory}/.openclaw"
-    # Remove old symlink if it exists
-    if [ -L "${config.home.homeDirectory}/.openclaw/openclaw.json" ]; then
-      rm -f "${config.home.homeDirectory}/.openclaw/openclaw.json"
+  # OpenClaw activation scripts
+  home.activation.linkOpenclawDocuments = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    DOC_DIR="${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw/documents"
+    WORKSPACE_DIR="${config.home.homeDirectory}/.openclaw/workspace"
+    
+    mkdir -p "$WORKSPACE_DIR"
+    rm -rf "$WORKSPACE_DIR"/*
+    
+    if [ -d "$DOC_DIR" ]; then
+      for doc in "$DOC_DIR"/*.md; do
+        if [ -f "$doc" ]; then
+          ln -sf "$doc" "$WORKSPACE_DIR/"
+        fi
+      done
+      echo "OpenClaw documents symlinked"
     fi
-    cp -f "${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw/openclaw.json" \
-      "${config.home.homeDirectory}/.openclaw/openclaw.json"
-    chmod 644 "${config.home.homeDirectory}/.openclaw/openclaw.json"
   '';
-
-  # Copy documents, build image, and setup secrets
-  home.activation.setupOpenclaw = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  
+  home.activation.setupOpenclaw = lib.hm.dag.entryAfter ["linkOpenclawDocuments"] ''
     export PATH="${pkgs.docker}/bin:$PATH"
     
     OPENCLAW_DIR="${openclawDir}"
-    WORKSPACE_DIR="${config.home.homeDirectory}/.openclaw/workspace"
-    DOC_DIR="${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw/documents"
     OPENCLAW_SRC="${config.home.homeDirectory}/.local/share/openclaw-src"
     
-    mkdir -p "$WORKSPACE_DIR"
-    
-    # Copy documents
-    if [ -d "$DOC_DIR" ]; then
-      cp -f "$DOC_DIR/"*.md "$WORKSPACE_DIR/" 2>/dev/null || true
-      echo "OpenClaw documents synced"
-    fi
-    
-    # Clone and build OpenClaw Docker image (controlled by OPENCLAW_BUILD_IMAGE env var)
+    # Docker image management
     if command -v docker >/dev/null 2>&1; then
       if [ "''${OPENCLAW_BUILD_IMAGE:-}" = "1" ] || [ "''${OPENCLAW_BUILD_IMAGE:-}" = "true" ]; then
         echo "OPENCLAW_BUILD_IMAGE is set - rebuilding OpenClaw Docker image..."
         
-        # Clone repository if not exists, otherwise update
         if [ ! -d "$OPENCLAW_SRC" ]; then
           echo "Cloning OpenClaw repository..."
           ${pkgs.git}/bin/git clone https://github.com/openclaw/openclaw.git "$OPENCLAW_SRC"
@@ -104,40 +193,16 @@ in
           cd "$OPENCLAW_SRC" && ${pkgs.git}/bin/git pull origin main
         fi
         
-        # Build Docker image
         cd "$OPENCLAW_SRC"
         docker build -t openclaw:local -f "$OPENCLAW_SRC/Dockerfile" "$OPENCLAW_SRC"
         echo "OpenClaw Docker image built successfully"
-      elif ! docker image inspect openclaw:local >/dev/null 2>&1; then
-        echo "OpenClaw Docker image not found. To build it, run:"
-        echo "  OPENCLAW_BUILD_IMAGE=1 home-manager switch --flake .#personal"
-        echo ""
-        echo "Or build manually:"
-        echo "  git clone https://github.com/openclaw/openclaw.git ~/.local/share/openclaw-src"
-        echo "  cd ~/.local/share/openclaw-src && docker build -t openclaw:local ."
-      else
-        echo "OpenClaw Docker image exists (set OPENCLAW_BUILD_IMAGE=1 to rebuild)"
       fi
-    else
-      echo "Note: Docker not available in activation, skipping image build"
     fi
     
-    # Create .env file with all tokens from sops (SOPS still encrypts these!)
+    # Create .env file with SOPS secrets
     TOKEN_FILE="${config.sops.secrets.openclaw_api_key.path}"
     if [ -f "$TOKEN_FILE" ]; then
       TOKEN=$(cat "$TOKEN_FILE")
-      
-      # Get Gemini key if available
-      GEMINI_KEY=""
-      if [ -f "${config.sops.secrets.gemini_api_key.path}" ] 2>/dev/null; then
-        GEMINI_KEY=$(cat "${config.sops.secrets.gemini_api_key.path}" 2>/dev/null || echo "")
-      fi
-      
-      # Get Telegram token if available
-      TELEGRAM_TOKEN=""
-      if [ -f "${config.sops.secrets.telegram_bot_token.path}" ] 2>/dev/null; then
-        TELEGRAM_TOKEN=$(cat "${config.sops.secrets.telegram_bot_token.path}" 2>/dev/null || echo "")
-      fi
       
       cat > "$OPENCLAW_DIR/.env" << EOF
 OPENCLAW_VERSION=latest
@@ -146,43 +211,28 @@ OPENCLAW_GATEWAY_BIND=0.0.0.0
 OPENCLAW_CONFIG_DIR=${config.home.homeDirectory}/.openclaw
 OPENCLAW_WORKSPACE_DIR=${config.home.homeDirectory}/.openclaw/workspace
 OPENCLAW_GATEWAY_TOKEN=$TOKEN
-GEMINI_API_KEY=$GEMINI_KEY
-TELEGRAM_BOT_TOKEN=$TELEGRAM_TOKEN
 EOF
       chmod 600 "$OPENCLAW_DIR/.env"
-      echo "OpenClaw environment configured with SOPS-encrypted secrets"
-    else
-      echo "Warning: OpenClaw API key not found, .env not created"
+      echo "OpenClaw environment configured"
     fi
-    
-    # Setup optional secrets (manual step after adding to secrets/openclaw.yaml)
-    # To enable Gemini and Telegram, add these keys to secrets/openclaw.yaml:
-    #   gemini_api_key: your-key-here
-    #   telegram_bot_token: your-token-here
-    # Then uncomment the secrets above and rebuild
   '';
-
-  # Zsh aliases for Docker-based OpenClaw
+  
+  # Zsh aliases for OpenClaw
   programs.zsh.initContent = lib.mkAfter ''
     export OPENCLAW_DIR="${openclawDir}"
     
-    # OpenClaw Docker aliases - Gateway management
     alias oc-up="cd $OPENCLAW_DIR && docker compose up -d"
     alias oc-down="cd $OPENCLAW_DIR && docker compose down"
     alias oc-logs="cd $OPENCLAW_DIR && docker compose logs -f openclaw-gateway"
     alias oc-ps="cd $OPENCLAW_DIR && docker compose ps"
     alias oc-shell="cd $OPENCLAW_DIR && docker compose exec openclaw-gateway /bin/sh"
     alias oc-health='curl -s http://localhost:18789/health | jq'
-    
-    # OpenClaw CLI aliases - Use these for openclaw commands
     alias oc="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli"
     alias oc-onboard="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli onboard"
     alias oc-channels="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli channels"
     alias oc-agents="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli agents"
     alias oc-tools="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli tools"
     alias oc-status="cd $OPENCLAW_DIR && docker compose run --rm openclaw-cli status"
-    
-    # Image rebuild alias
     alias oc-rebuild="echo 'Run: OPENCLAW_BUILD_IMAGE=1 home-manager switch --flake .#personal'"
     
     export PERSONAL_ENV=1

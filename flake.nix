@@ -15,25 +15,43 @@
   outputs = { self, nixpkgs, nix-darwin, home-manager, flake-utils, sops-nix, ... }@inputs:
   let
     system = "aarch64-darwin";
+    username = "dennisvandijk";
+    
+    # Helper to create my.* namespace args
+    mkMyArgs = hostName: {
+      inherit username hostName;
+      isDarwin = true;
+      isPersonal = hostName == "personal";
+      isWork = hostName == "work";
+    };
   in
   {
+    # Darwin configurations
     darwinConfigurations = builtins.listToAttrs (map (hostName: {
       name = hostName;
       value = nix-darwin.lib.darwinSystem {
         inherit system;
-        specialArgs = { username = "dennisvandijk"; inherit inputs; };
+        specialArgs = { 
+          inherit username inputs;
+          my = mkMyArgs hostName;
+        };
         modules = [ ./hosts/${hostName}/darwin.nix ];
       };
     }) [ "work" "personal" ]);
 
+    # Home Manager configurations
     homeConfigurations = builtins.listToAttrs (map (hostName: {
       name = hostName;
       value = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
+          config.allowUnsupportedSystem = true;
         };
-        extraSpecialArgs = { inherit inputs; };
+        extraSpecialArgs = { 
+          inherit inputs;
+          my = mkMyArgs hostName;
+        };
         modules = [
           ./hosts/${hostName}/home.nix
           sops-nix.homeManagerModules.sops
