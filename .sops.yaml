@@ -2,12 +2,13 @@
 # This file defines which keys can encrypt/decrypt secrets
 
 keys:
-  # Jouw persoonlijke key
-  - &user_dennis age14qrqnrh9d7ap5c5srskechsr4ud4vnxwe69z0uryzja59xt5eehqf5c0u7
+  - &user_dennis_macbook age1ew02ftu6j8jrl4hdr497vuplqrz030h5l5tx630mxjje9948gdcsh5qjdz
+  - &user_dennis_macmini age14qrqnrh9d7ap5c5srskechsr4ud4vnxwe69z0uryzja59xt5eehqf5c0u7
 
 creation_rules:
   # Alles in secrets/ directory
-  - path_regex: secrets/.*(yaml|json|env|ini)$
+  - path_regex: secrets/.*\.(yaml|json|env|ini)$
     key_groups:
       - age:
-          - *user_dennis
+          - *user_dennis_macbook
+          - *user_dennis_macmini

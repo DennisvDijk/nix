@@ -1,0 +1,41 @@
+# Nix build results
+result
+result-*
+*.qcow2
+
+# Editor backup/swap files
+*~
+*.swp
+*.swo
+*.tmp
+.*.swp
+.*.swo
+.vscode/
+.idea/
+*.sublime-*
+
+# macOS specifiek
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# SOPS-Nix: nooit plaintext of backup secrets
+# (Encrypted secrets met ENC[...] WEL in git!)
+secrets/*.decrypted.*
+secrets/*.backup.*
+secrets/*.plain.*
+secrets/*.yaml.tmp
+secrets/*.yaml.enc
+*.sops.tmp
+
+# Age private keys - NOOIT in git!
+**/keys.txt
+**/.sops/age/keys.txt
+.age-key*
+
+# Home-manager backup files
+*.hmbak
+
+# Temp files
+*.log
+*.pid

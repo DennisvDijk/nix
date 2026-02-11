@@ -161,6 +161,15 @@
       gupa = "git pull --rebase --autostash";
       gupav = "git pull --rebase --autostash -v";
       gupv = "git pull --rebase -v";
+      
+      # SOPS-Nix secrets management
+      edit-secrets = "~/.config/nix/bin/edit-secrets.sh";
+      esec = "edit-secrets";
+      sops-edit = "cd ~/.config/nix && nix-shell -p sops --run 'sops'";
+      
+      # Telegram shortcuts
+      tgsend = "telegram-send";
+      tginfo = "telegram-info";
     };
 
     # Common shell initialization
@@ -228,6 +237,86 @@
         home-manager switch --flake ~/.config/nix#$host && \
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" && \
         echo "✅ Rebuild complete!"
+      }
+      
+      # SOPS secrets management functies
+      function sops-new() {
+        local secret_name="$1"
+        if [ -z "$secret_name" ]; then
+          echo "❌ Gebruik: sops-new <naam>"
+          echo "Voorbeeld: sops-new database"
+          return 1
+        fi
+        
+        local secrets_dir="$HOME/.config/nix/secrets"
+        local secret_file="$secrets_dir/''${secret_name}.yaml"
+        
+        if [ -f "$secret_file" ]; then
+          echo "⚠️  Secret bestaat al: $secret_file"
+          echo "Gebruik 'edit-secrets $secret_name' om te bewerken"
+          return 1
+        fi
+        
+        echo "📝 Nieuwe secret file aanmaken: $secret_file"
+        echo "''${secret_name}_key: \"changeme\"" > "$secret_file"
+        
+        echo "🔐 Versleutelen met sops..."
+        cd "$HOME/.config/nix" && nix-shell -p sops --run "sops -e -i \"$secret_file\""
+        
+        echo "✅ Secret aangemaakt!"
+        echo "📝 Bewerk met: edit-secrets $secret_name"
+      }
+      
+      function sops-rekey() {
+        echo "🔄 Alle secrets opnieuw versleutelen..."
+        cd "$HOME/.config/nix"
+        for f in secrets/*.yaml; do
+          echo "  🔐 Rekey: $f"
+          nix-shell -p sops --run "sops updatekeys \"$f\""
+        done
+        echo "✅ Rekey voltooid!"
+      }
+      
+      # Telegram helper functies
+      function telegram-send() {
+        local message="$1"
+        local bot_token_file="''${TELEGRAM_BOT_TOKEN_FILE:-$HOME/.config/sops-nix/secrets/telegram_bot_token}"
+        local chat_id_file="''${TELEGRAM_CHAT_ID_FILE:-$HOME/.config/sops-nix/secrets/telegram_chat_id}"
+        
+        if [ -z "$message" ]; then
+          echo "❌ Gebruik: telegram-send <bericht>"
+          echo "Voorbeeld: telegram-send 'Hallo vanuit Nix!'"
+          return 1
+        fi
+        
+        if [ ! -f "$bot_token_file" ]; then
+          echo "❌ Telegram bot token niet gevonden: $bot_token_file"
+          echo "💡 Deploy eerst: home-manager switch --flake ~/.config/nix#\''${NIX_HOST:-personal}"
+          return 1
+        fi
+        
+        local bot_token=$(cat "$bot_token_file")
+        local chat_id=$(cat "$chat_id_file")
+        
+        curl -s -X POST "https://api.telegram.org/bot''${bot_token}/sendMessage" \
+          -d "chat_id=''${chat_id}" \
+          -d "text=''${message}" \
+          -d "parse_mode=Markdown" > /dev/null
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Bericht verstuurd naar Telegram!"
+        else
+          echo "❌ Fout bij versturen"
+        fi
+      }
+      
+      function telegram-info() {
+        local bot_name_file="''${TELEGRAM_BOT_NAME_FILE:-$HOME/.config/sops-nix/secrets/telegram_bot_name}"
+        if [ -f "$bot_name_file" ]; then
+          echo "🤖 Telegram Bot: $(cat "$bot_name_file")"
+        fi
+        echo "📁 Token file: ''${TELEGRAM_BOT_TOKEN_FILE:-$HOME/.config/sops-nix/secrets/telegram_bot_token}"
+        echo "📁 Chat ID file: ''${TELEGRAM_CHAT_ID_FILE:-$HOME/.config/sops-nix/secrets/telegram_chat_id}"
       }
     '';
   };

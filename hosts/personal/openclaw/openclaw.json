@@ -1,0 +1,31 @@
+{
+  "gateway": {
+    "mode": "local",
+    "port": 18789,
+    "auth": {
+      "mode": "token"
+    }
+  },
+  "logging": {
+    "redactSensitive": "tools",
+    "redactPatterns": ["GEMINI_API_KEY", "OPENCLAW_GATEWAY_TOKEN"]
+  },
+  "agents": {
+    "defaults": {
+      "sandbox": {
+        "mode": "all",
+        "scope": "agent"
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "workspace": "/home/node/.openclaw/workspace",
+        "tools": {
+          "allow": ["read", "write", "web_search"],
+          "deny": ["exec", "process", "browser"]
+        }
+      }
+    ]
+  }
+}

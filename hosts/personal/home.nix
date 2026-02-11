@@ -1,39 +1,152 @@
+# hosts/personal/home.nix
+# Personal host home configuration using feature flags
+
 { config, pkgs, lib, inputs, ... }:
 
 {
   imports = [
-    ../../modules/shared/home-manager.nix
-    ../../modules/home/openclaw.nix
+    ../../modules/home/features  # Import all feature modules
   ];
 
-  # SOPS configuration for secret management
-  sops = {
-    # Pad naar je age private key (macOS specifiek!)
-    age.keyFile = "/Users/dennisvandijk/Library/Application Support/sops/age/keys.txt";
+  # Host-specific identity
+  home.username = "dennisvandijk";
+  home.homeDirectory = "/Users/dennisvandijk";
+  home.stateVersion = "25.05";
+
+  # Enable Home Manager
+  programs.home-manager.enable = true;
+
+  # Feature flags configuration
+  my.features = {
+    # Core (enabled by default)
+    shell = {
+      enable = true;
+      starship.enable = true;
+      direnv.enable = true;
+      zoxide.enable = true;
+      atuin.enable = true;
+    };
     
-    # Standaard secrets file
-    defaultSopsFile = ../../secrets/example.yaml;
+    cli.enable = true;
     
-    # Definieer welke secrets je wilt gebruiken
-    secrets = {
-      # Dit maakt het secret beschikbaar via: config.sops.secrets.openclaw_api_key.path
-      openclaw_api_key = {};
-      
-      # Je kunt ook andere secrets toevoegen:
-      # database_password = {};
-      # "services/github/token" = {};  # voor nested keys
+    git = {
+      enable = true;
+      userName = "Dennis van Dijk";
+      userEmail = "dennis@thenextgen.nl";
+      delta.enable = true;
+      lazygit.enable = true;
+      jujutsu.enable = true;
+      githubCli.enable = true;
+    };
+    
+    terminal = {
+      enable = true;
+      wezterm.enable = true;
+      alacritty.enable = true;
+      kitty.enable = false;
+      iterm2.enable = true;
+    };
+    
+    # nh configuration
+    nh = {
+      enable = true;
+      flakeDir = "${config.home.homeDirectory}/.config/nix";
+      defaultDarwinHost = "personal";
+    };
+    
+    # Personal-specific features
+    dev = {
+      enable = true;
+      docker.enable = true;
+      node.enable = true;
+      python.enable = true;
+      http.enable = true;
+    };
+    
+    k8s = {
+      enable = true;
+      kubectl.enable = true;
+      k9s.enable = true;
+      helm.enable = false;  # Not needed for personal
+      operators.enable = false;
+      cloud.enable = false;
+    };
+    
+    ai = {
+      enable = true;
+      codingAssistants.enable = true;
+      llmTools.enable = true;
+      localLLMs.enable = true;
+    };
+    
+    # OpenClaw AI assistant - disabled by default
+    # Enable only on machines where you want to run OpenClaw
+    openclaw = {
+      enable = true;  # Set to false on other machines
+      buildImage = false;  # Set to true to build Docker image
+      configDir = "${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw";
     };
   };
 
-  # Personal-specific environment variable
+  # User identity configuration
+  # These are personal identifiers, not sensitive secrets
+  my.user = {
+    fullName = "Dennis van Dijk";
+    firstName = "Dennis";
+    lastName = "van Dijk";
+    email.personal = "dennis@thenextgen.nl";
+    email.git = "dennis@thenextgen.nl";
+    email.work = "";
+    username = "dennisvandijk";
+    homeDirectory = "/Users/dennisvandijk";
+  };
+
+  # SOPS configuration for secret management (API keys, tokens, passwords)
+  sops = {
+    age.keyFile = "/Users/dennisvandijk/Library/Application Support/sops/age/keys.txt";
+    defaultSopsFile = ../../secrets/example.yaml;
+    
+    secrets = {
+      openclaw_api_key = {
+        sopsFile = ../../secrets/openclaw.yaml;
+        key = "openclaw_api_key";
+      };
+      telegram_bot_name = {
+        sopsFile = ../../secrets/openclaw.yaml;
+        key = "telegram_bot_name";
+      };
+      telegram_bot_token = {
+        sopsFile = ../../secrets/openclaw.yaml;
+        key = "telegram_bot_token";
+      };
+      telegram_chat_id = {
+        sopsFile = ../../secrets/openclaw.yaml;
+        key = "telegram_chat_id";
+      };
+    };
+  };
+
+  # LM Studio configuration
+  home.sessionPath = [
+    "${config.home.homeDirectory}/.lmstudio/bin"
+  ];
+
+  home.file.".config/lm-studio/config.json".text = lib.mkForce ''
+    {
+      "bootstrappedByHomeManager": true
+    }
+  '';
+
+  # Personal-specific packages (things not covered by features)
+  home.packages = with pkgs; [
+    # Media tools (personal-specific)
+    ffmpeg
+    imagemagick
+  ];
+
+  # Zsh environment variables for personal host
   programs.zsh.initContent = lib.mkAfter ''
     export PERSONAL_ENV=1
     export NIX_HOST="personal"
   '';
-
-  # Personal-specific packages
-  home.packages = with pkgs; [
-    ffmpeg
-    imagemagick
-  ];
 }

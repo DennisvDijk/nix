@@ -46,13 +46,14 @@
       "firefox@nightly"
       "orion"
       "raycast"
-      "tailscale"
+      "tailscale-app"
       "visual-studio-code"
       "orbstack"
       "lm-studio"
       "llamabarn"
       "wave"
       "parsec"
+      "stats"
       "blender"
     ];
   };
@@ -70,6 +71,8 @@
     wezterm
     alacritty  # Migrated from Homebrew
     k9s
+    telegram-desktop
+    gnupg
   ];
 
   # Default: show macOS menu bar
