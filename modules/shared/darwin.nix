@@ -46,7 +46,7 @@
       "firefox@nightly"
       "orion"
       "raycast"
-      "tailscale"
+      "tailscale-app"
       "visual-studio-code"
       "orbstack"
       "lm-studio"

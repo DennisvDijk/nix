@@ -23,12 +23,9 @@
   };
 
   # Nix configuration
-  nix.enable = true;
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    trusted-users = [ "dennisvandijk" ];
-  };
-  nix.optimise.automatic = true;
+  # MacBook gebruikt Determinate Nix, Mac Mini niet
+  # Op Mac Mini: verander naar nix.enable = true
+  nix.enable = false;  # false voor Determinate, true voor standaard Nix
 
   # Darwin feature flags
   my.darwin = {

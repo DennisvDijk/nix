@@ -86,8 +86,8 @@
     goose
     zsh-autosuggestions
 
-    # AI-related tools
-    claude-code
+    # AI-related tools - claude-code temporarily disabled due to npm registry connection issues
+    # claude-code
     codex
     aider-chat
     gemini-cli

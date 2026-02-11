@@ -65,7 +65,7 @@ in
         "wave"
         
         # AI/ML
-        "ollama"
+        "ollama-app"
         "lm-studio"
         "llamabarn"
         
@@ -74,7 +74,7 @@ in
         "rectangle"
         "jordanbaird-ice"
         "stats"
-        "tailscale"
+        "tailscale-app"
         "parsec"
         
         # Gaming/Fun
@@ -90,9 +90,10 @@ in
         # "Things 3" = 904280696;
       };
 
+      # Deprecated taps removed (cask-versions and cask-fonts merged into main homebrew/cask)
       taps = [
-        "homebrew/cask-versions"
-        "homebrew/cask-fonts"
+        # "homebrew/cask-versions"  # Deprecated - merged into homebrew/cask
+        # "homebrew/cask-fonts"     # Deprecated - use font- prefixed casks directly
       ];
     };
 

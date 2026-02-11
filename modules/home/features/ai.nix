@@ -20,7 +20,7 @@ in
     home.packages = mkMerge [
       (mkIf cfg.codingAssistants.enable (with pkgs; [
         # AI coding assistants from Nix (not Homebrew!)
-        claude-code         # Claude Code CLI
+        # claude-code         # Claude Code CLI - temporarily disabled due to npm registry connection issues
         codex               # OpenAI Codex CLI
         aider-chat          # AI pair programming
         gemini-cli          # Google Gemini CLI
@@ -70,8 +70,8 @@ in
 
     # Shell aliases for AI tools
     programs.zsh.shellAliases = {
-      # Claude Code
-      cc = "claude-code";
+      # Claude Code - temporarily disabled
+      # cc = "claude-code";
       
       # Aider
       ai = "aider";
