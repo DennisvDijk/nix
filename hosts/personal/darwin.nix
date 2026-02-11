@@ -44,7 +44,7 @@
       autoUpdate = true;
       cleanup = true;
       casks.enable = true;
-      brews.enable = false;  # Prefer Nix for CLI
+      brews.enable = true;  # Enable voor opencode en andere custom tools
       mas.enable = false;
     };
   };

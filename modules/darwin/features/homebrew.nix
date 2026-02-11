@@ -41,7 +41,8 @@ in
       brews = mkIf cfg.brews.enable [
         # Only put here what CANNOT be in Nix
         # Example: Tools that need specific macOS frameworks
-        # "imagemagick"  # <- Better in Nix!
+        # Note: opencode and claude-code are in shared/darwin.nix
+        "opencode"
       ];
 
       casks = mkIf cfg.casks.enable [
@@ -68,6 +69,7 @@ in
         "ollama-app"
         "lm-studio"
         "llamabarn"
+        "claude-code"
         
         # Utilities
         "raycast"
