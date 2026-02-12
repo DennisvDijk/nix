@@ -15,6 +15,7 @@
     ./terminal.nix
     ./nh.nix
     ./openclaw.nix
+    ../../shared/ui/fonts.nix
   ];
   
   # Global feature options
