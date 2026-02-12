@@ -42,7 +42,7 @@
 
 #### Step 1: Add migrated packages to Nix configuration
 
-Edit `/Users/dennisvandijk/.config/nix/modules/shared/darwin.nix`:
+Edit `~/.config/nix/modules/shared/darwin.nix`:
 
 ```nix
 environment.systemPackages = with pkgs; [
@@ -62,7 +62,7 @@ environment.systemPackages = with pkgs; [
 
 #### Step 2: Remove migrated packages from Homebrew casks
 
-Edit `/Users/dennisvandijk/.config/nix/modules/shared/darwin.nix`:
+Edit `~/.config/nix/modules/shared/darwin.nix`:
 
 ```nix
 # Remove these from homebrew.casks:

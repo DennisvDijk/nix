@@ -12,8 +12,8 @@ All personal information has been identified and properly handled. True secrets 
 - `hosts/personal/home.nix` (lines 67-68)
 
 **Information**:
-- Name: "Dennis van Dijk"
-- Email: "dennis@thenextgen.nl"
+- Name: "[Your Full Name]"
+- Email: "[your.email@example.com]"
 
 **Resolution**:
 - Removed defaults from git module (now uses `null`)
@@ -30,8 +30,8 @@ All personal information has been identified and properly handled. True secrets 
 - `modules/shared/home-manager.nix` (lines 12, 13)
 
 **Information**:
-- Username: "dennisvandijk"
-- Home: "/Users/dennisvandijk"
+- Username: "[yourusername]"
+- Home: "/Users/[yourusername]"
 
 **Resolution**:
 - These are **system identifiers**, not secrets
@@ -39,7 +39,7 @@ All personal information has been identified and properly handled. True secrets 
 - Now also in `my.user.username` and `my.user.homeDirectory` for reference
 
 ### 3. **Email Domain** ✅ RESOLVED
-**Information**: "thenextgen.nl"
+**Information**: "[yourdomain.com]"
 
 **Resolution**:
 - Part of email address in user config
@@ -51,7 +51,7 @@ All personal information has been identified and properly handled. True secrets 
 - `hosts/work/home.nix` (line 10 - commented)
 
 **Information**:
-- Path: `/Users/dennisvandijk/Library/Application Support/sops/age/keys.txt`
+- Path: `~/Library/Application Support/sops/age/keys.txt`
 
 **Resolution**:
 - This is a **system path**, not a secret
@@ -100,13 +100,13 @@ secrets/
 Now centralized in `hosts/personal/home.nix`:
 ```nix
 my.user = {
-  fullName = "Dennis van Dijk";
-  firstName = "Dennis";
-  lastName = "van Dijk";
-  email.personal = "dennis@thenextgen.nl";
-  email.git = "dennis@thenextgen.nl";
-  username = "dennisvandijk";
-  homeDirectory = "/Users/dennisvandijk";
+  fullName = "[Your Full Name]";
+  firstName = "[FirstName]";
+  lastName = "[LastName]";
+  email.personal = "[your.email@example.com]";
+  email.git = "[your.email@example.com]";
+  username = "[yourusername]";
+  homeDirectory = "/Users/[yourusername]";
 };
 ```
 
@@ -162,10 +162,10 @@ Create `hosts/<newhost>/home.nix`:
 Each host can have different user config:
 ```nix
 # hosts/work/home.nix
-my.user.email.git = "dennis.vandijk@company.com";
+my.user.email.git = "[your.name@company.com]";
 
 # hosts/personal/home.nix  
-my.user.email.git = "dennis@thenextgen.nl";
+my.user.email.git = "[your.email@example.com]";
 ```
 
 ## Files Modified
@@ -187,7 +187,7 @@ cat secrets/user.yaml | head -5
 
 # Check secrets can be read
 sops -d secrets/user.yaml | grep full_name
-# Should show: "Dennis van Dijk"
+# Should show: "[Your Full Name]"
 
 # Rebuild and verify
 darwin-rebuild switch --flake .#personal
