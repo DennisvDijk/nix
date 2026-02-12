@@ -57,7 +57,7 @@ To assist the user with:
 ## User Context
 
 ### User
-Dennis van Dijk
+[User Name]
 
 ### Preferences
 - macOS ecosystem

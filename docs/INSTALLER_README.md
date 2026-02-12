@@ -6,10 +6,10 @@ A one-command installer for setting up Nix, Nix Darwin, and Home Manager on macO
 
 ```bash
 # Download and run the installer
-curl -fsSL https://raw.githubusercontent.com/dennisvandijk/nix-config/main/bin/install-nix-config.sh | bash
+curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/nix-config/main/bin/install-nix-config.sh | bash
 
 # Or with specific hostname
-curl -fsSL https://raw.githubusercontent.com/dennisvandijk/nix-config/main/bin/install-nix-config.sh | bash -s -- personal
+curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/nix-config/main/bin/install-nix-config.sh | bash -s -- personal
 ```
 
 ## 📋 What This Script Does
@@ -61,7 +61,7 @@ curl -fsSL https://raw.githubusercontent.com/dennisvandijk/nix-config/main/bin/i
 ### From Repository
 ```bash
 # Clone repository
-git clone https://github.com/dennisvandijk/nix-config.git ~/.config/nix
+git clone https://github.com/YOUR_USERNAME/nix-config.git ~/.config/nix
 cd ~/.config/nix
 
 # Run installer

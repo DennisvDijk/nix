@@ -107,8 +107,8 @@ my.features = {
   cli.enable = true;
   git = {
     enable = true;
-    userName = "Dennis van Dijk";
-    userEmail = "dennis@thenextgen.nl";
+    userName = "Your Name";
+    userEmail = "your.email@example.com";
   };
   dev = {
     enable = true;

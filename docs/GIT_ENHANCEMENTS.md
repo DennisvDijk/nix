@@ -278,7 +278,7 @@ alias | grep "^g"
 ```
 
 Or see the configuration in:
-`/Users/dennisvandijk/.config/nix/modules/shared/programs/zsh.nix`
+`~/.config/nix/modules/shared/programs/zsh.nix`
 
 ## 🔧 Customization
 
