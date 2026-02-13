@@ -86,6 +86,12 @@
       buildImage = false;  # Set to true to build Docker image
       configDir = "${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw";
     };
+    
+    # OpenCode DevTools - Self-hosted AI development tools
+    devtools = {
+      enable = true;
+      configDir = "${config.home.homeDirectory}/.config/nix/hosts/personal/opencode-tools";
+    };
   };
 
   # User identity configuration

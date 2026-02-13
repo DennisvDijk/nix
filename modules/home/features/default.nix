@@ -15,6 +15,7 @@
     ./terminal.nix
     ./nh.nix
     ./openclaw.nix
+    ./devtools.nix
     ../../shared/ui/fonts.nix
   ];
   
