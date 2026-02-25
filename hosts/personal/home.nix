@@ -1,24 +1,24 @@
 # hosts/personal/home.nix
 # Personal host home configuration using feature flags
 
-{ config, pkgs, lib, inputs, ... }:
+{ config, pkgs, lib, inputs, username, hostName, ... }:
 
 {
   imports = [
-    ../../modules/home/features  # Import all feature modules
+    ../../modules/shared/home-manager.nix  # Base config (core packages)
+    ../../modules/home/features             # Feature system
   ];
 
-  # Host-specific identity
-  home.username = "dennisvandijk";
-  home.homeDirectory = "/Users/dennisvandijk";
-  home.stateVersion = "25.05";
+  # Host identification (provided by flake via specialArgs)
+  home.username = username;
+  home.homeDirectory = "/Users/${username}";
 
   # Enable Home Manager
   programs.home-manager.enable = true;
 
-  # Feature flags configuration
+  # Feature flags configuration - personal has everything enabled
   my.features = {
-    # Core (enabled by default)
+    # Core (enabled by default via features/default.nix)
     shell = {
       enable = true;
       starship.enable = true;
@@ -103,8 +103,8 @@
     email.personal = "dennis@thenextgen.nl";
     email.git = "dennis@thenextgen.nl";
     email.work = "";
-    username = "dennisvandijk";
-    homeDirectory = "/Users/dennisvandijk";
+    username = username;
+    homeDirectory = "/Users/${username}";
   };
 
   # SOPS configuration for secret management (API keys, tokens, passwords)
@@ -132,17 +132,6 @@
     };
   };
 
-  # LM Studio configuration
-  home.sessionPath = [
-    "${config.home.homeDirectory}/.lmstudio/bin"
-  ];
-
-  home.file.".config/lm-studio/config.json".text = lib.mkForce ''
-    {
-      "bootstrappedByHomeManager": true
-    }
-  '';
-
   # Personal-specific packages (things not covered by features)
   home.packages = with pkgs; [
     # Media tools (personal-specific)
@@ -154,6 +143,6 @@
   # Zsh environment variables for personal host
   programs.zsh.initContent = lib.mkAfter ''
     export PERSONAL_ENV=1
-    export NIX_HOST="personal"
+    export NIX_HOST="${hostName}"
   '';
 }
