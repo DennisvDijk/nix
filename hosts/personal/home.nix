@@ -148,6 +148,7 @@
     # Media tools (personal-specific)
     ffmpeg
     imagemagick
+    mosh
   ];
 
   # Zsh environment variables for personal host

@@ -21,11 +21,7 @@
   {
     "bootstrappedByHomeManager": true
   }
-  '';
-
-  # OpenCode configuration
-  home.file.".config/opencode/opencode.json".source = config.lib.file.mkOutOfStoreSymlink
-    "${config.home.homeDirectory}/.config/nix/modules/config/opencode/opencode.json";
+'';
 
   # Aerospace window manager configuration
   home.file.".aerospace.toml".source = config.lib.file.mkOutOfStoreSymlink
@@ -94,5 +90,8 @@
 
     # k8s
     kubectl
+
+    # remote connection
+    mosh
   ];
 }
