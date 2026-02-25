@@ -15,6 +15,13 @@
       }
     }
   },
+  "plugin": [
+    "opencode-wakatime",
+    "opencode-helicone-session",
+    "@nick-vi/opencode-type-inject",
+    "@tarquinen/opencode-dcp@latest",
+    "oh-my-opencode"
+  ],
   "share": "manual",
   "autoupdate": "notify",
   "compaction": {

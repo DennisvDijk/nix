@@ -320,7 +320,9 @@
       }
     '';
   };
+};
 
+# fzf, zoxide, direnv are configured in feature modules
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;

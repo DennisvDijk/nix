@@ -55,6 +55,7 @@
       "parsec"
       "stats"
       "blender"
+      "emdash"
     ];
   };
 

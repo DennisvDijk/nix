@@ -1,0 +1,312 @@
+services:
+  # ============================================
+  # Core Infrastructure
+  # ============================================
+  
+  postgres:
+    image: postgres:16-alpine
+    container_name: devtools-postgres
+    restart: unless-stopped
+    profiles:
+      - full
+      - database
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-devtools}
+      POSTGRES_USER: ${POSTGRES_USER:-devtools}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devtools-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - devtools-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devtools}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: devtools-valkey
+    restart: unless-stopped
+    profiles:
+      - full
+      - search
+      - cache
+    command: valkey-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - valkey_data:/data
+    ports:
+      - "${VALKEY_PORT:-6379}:6379"
+    networks:
+      - devtools-network
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Search & Discovery
+  # ============================================
+  
+  searxng:
+    image: searxng/searxng:latest
+    container_name: devtools-searxng
+    restart: unless-stopped
+    profiles:
+      - full
+      - search
+    environment:
+      SEARXNG_BASE_URL: "http://localhost:${SEARXNG_PORT:-8080}/"
+      SEARXNG_SECRET: "${SEARXNG_SECRET:-$(openssl rand -hex 32)}"
+      SEARXNG_VALKEY_URL: "valkey://valkey:6379/0"
+      SEARXNG_DDG_API_KEY: "${SEARXNG_DDG_API_KEY:-}"
+      SEARXNG_DDG_SAFE_SEARCH: "0"
+      SEARXNG_DEFAULT_LANG: "en"
+      SEARXNG_INSTANCE_NAME: "OpenCode DevTools"
+      SEARXNG_ENABLE_TOR: "false"
+      SEARXNG_LIMITER: "false"
+      SEARXNG_RATELIMIT: "false"
+    volumes:
+      - searxng_config:/etc/searxng
+    ports:
+      - "${SEARXNG_PORT:-8080}:8080"
+    depends_on:
+      valkey:
+        condition: service_healthy
+    networks:
+      - devtools-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # Local LLM & AI
+  # ============================================
+  
+  ollama:
+    image: ollama/ollama:latest
+    container_name: devtools-ollama
+    restart: unless-stopped
+    profiles:
+      - full
+      - ai
+      - llm
+    environment:
+      OLLAMA_HOST: ${OLLAMA_HOST:-0.0.0.0:11434}
+      OLLAMA_MODELS: ${OLLAMA_MODELS:-/root/.ollama}
+      OLLAMA_NUM_PARALLEL: 4
+      OLLAMA_MAX_LOADED_MODELS: 2
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    networks:
+      - devtools-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  litellm:
+    image: ghcr.io/litellm/litellm:main
+    container_name: devtools-litellm
+    restart: unless-stopped
+    profiles:
+      - full
+      - ai
+      - llm
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-devtools-12345}
+      LITELLM_LOG_LEVEL: "INFO"
+      LITELLM_DROP_CACHE: ${LITELLM_DROP_CACHE:-true}
+      LITELLM_MAX_PARALLEL_REQUESTS: ${LITELLM_MAX_PARALLEL_REQUESTS:-100}
+      LITELLM_REQUEST_TIMEOUT: 600
+      
+      # Ollama configuration
+      OLLAMA_BASE_URL: "http://ollama:11434"
+      
+      # NVIDIA KIMI configuration (free tier available)
+      NVIDIA_KIMI_API_KEY: ${NVIDIA_KIMI_API_KEY:-}
+      
+      # Database for LiteLLM (optional - uses in-memory if not provided)
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-devtools}:${POSTGRES_PASSWORD:-devtools-password}@postgres:5432/${POSTGRES_DB:-devtools}"
+      
+      # Model configurations
+      LITELLM_MODEL_LIST: |
+        - model_list:
+          - model_name: qwen3:8b
+            litellm_params:
+              model: ollama/qwen3:8b
+              api_base: http://ollama:11434
+          - model_name: llama3.2:3b
+            litellm_params:
+              model: ollama/llama3.2:3b
+              api_base: http://ollama:11434
+          - model_name: mistral:7b
+            litellm_params:
+              model: ollama/mistral:7b
+              api_base: http://ollama:11434
+          - model_name: nvidia/kimi-nemo-12b
+            litellm_params:
+              model: nvidia_kimi/kimi-nemo-12b
+              api_key: os.environ/NVIDIA_KIMI_API_KEY
+          - model_name: nvidia/llama-3.1-nemotron-70b-instruct
+            litellm_params:
+              model: nvidia_nemotron/llama-3.1-nemotron-70b-instruct
+              api_key: os.environ/NVIDIA_KIMI_API_KEY
+    
+    volumes:
+      - litellm_config:/app/config
+    ports:
+      - "${LITELLM_PORT:-4000}:4000"
+    depends_on:
+      ollama:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - devtools-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: devtools-open-webui
+    restart: unless-stopped
+    profiles:
+      - full
+      - ai
+    environment:
+      OLLAMA_BASE_URLS: "http://litellm:4000/v1"
+      OPEN_WEBUI_SECRET_KEY: ${OPEN_WEBUI_SECRET_KEY:-openwebui-devtools-secret}
+      OPEN_WEBUI_ENABLE_SIGNUP: ${OPEN_WEBUI_ENABLE_SIGNUP:-false}
+      OPEN_WEBUI_ENABLE_API_KEY: "true"
+      OPEN_WEBUI_API_KEY: ${LITELLM_MASTER_KEY:-sk-devtools-12345}
+    volumes:
+      - openwebui_data:/app/backend/data
+    ports:
+      - "${OPEN_WEBUI_PORT:-3000}:8080"
+    depends_on:
+      litellm:
+        condition: service_healthy
+    networks:
+      - devtools-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # Workflow & Automation
+  # ============================================
+  
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: devtools-n8n
+    restart: unless-stopped
+    profiles:
+      - full
+      - workflow
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: ${N8N_BASIC_AUTH_ACTIVE:-true}
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD:-devtools}
+      N8N_HOST: ${N8N_HOST:-0.0.0.0}
+      N8N_PORT: ${N8N_PORT:-5678}
+      N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
+      N8N_EDITOR_BASE_URL: "http://localhost:${N8N_PORT:-5678}"
+      
+      # External storage (optional)
+      # N8N_EXTERNAL_STORAGE_S3: "true"
+      # N8N_S3_HOST: "localhost"
+      # N8N_S3_BUCKET: "n8n"
+      
+      # Database (optional - uses SQLite if not provided)
+      # DB_TYPE: "postgresdb"
+      # DB_POSTGRESDB_HOST: "postgres"
+      # DB_POSTGRESDB_PORT: "5432"
+      # DB_POSTGRESDB_DATABASE: "${POSTGRES_DB:-devtools}"
+      # DB_POSTGRESDB_USER: "${POSTGRES_USER:-devtools}"
+      # DB_POSTGRESDB_PASSWORD: "${POSTGRES_PASSWORD:-devtools-password}"
+      
+      # General
+      N8N_LOG_LEVEL: "info"
+      N8N_LOG_OUTPUT: "console"
+      EXECUTIONS_MODE: "regular"
+      EXECUTIONS_TIMEOUT: 300
+    volumes:
+      - n8n_data:/home/node/.n8n
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    networks:
+      - devtools-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # Vector Database (RAG)
+  # ============================================
+  
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: devtools-qdrant
+    restart: unless-stopped
+    profiles:
+      - full
+      - vector
+    environment:
+      QDRANT_HOST: ${QDRANT_HOST:-0.0.0.0}
+      QDRANT_GRPC_PORT: 6334
+      QDRANT_HTTP_PORT: 6333
+      QDRANT_STORAGE: "/qdrant/storage"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+      - "6334:6334"
+    networks:
+      - devtools-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ============================================
+# Networks & Volumes
+# ============================================
+
+networks:
+  devtools-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  valkey_data:
+    driver: local
+  searxng_config:
+    driver: local
+  ollama_data:
+    driver: local
+  litellm_config:
+    driver: local
+  openwebui_data:
+    driver: local
+  n8n_data:
+    driver: local
+  qdrant_data:
+    driver: local

@@ -16,6 +16,7 @@
   let
     system = "aarch64-darwin";
     username = "dennisvandijk";
+    homeDirectory = "/Users/dennisvandijk";
     
     # Helper to create my.* namespace args
     mkMyArgs = hostName: {
@@ -37,7 +38,7 @@
         };
         modules = [ ./hosts/${hostName}/darwin.nix ];
       };
-    }) [ "work" "personal" ]);
+    }) [ "work" "personal" "template" ]);
 
     # Home Manager configurations
     homeConfigurations = builtins.listToAttrs (map (hostName: {
@@ -49,7 +50,7 @@
           config.allowUnsupportedSystem = true;
         };
         extraSpecialArgs = { 
-          inherit inputs;
+          inherit inputs username homeDirectory hostName;
           my = mkMyArgs hostName;
         };
         modules = [
@@ -57,6 +58,6 @@
           sops-nix.homeManagerModules.sops
         ];
       };
-    }) [ "work" "personal" ]);
+    }) [ "work" "personal" "template" ]);
   };
 }

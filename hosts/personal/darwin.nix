@@ -42,7 +42,7 @@
       enable = true;
       nixHomebrew.enable = false;  # Can enable later
       autoUpdate = true;
-      cleanup = true;
+      cleanup = false;
       casks.enable = true;
       brews.enable = true;  # Enable voor opencode en andere custom tools
       mas.enable = false;
@@ -53,6 +53,7 @@
   homebrew.casks = lib.mkAfter [
     "steam"
     "vlc"
+    "emdash"
   ];
 
   # Environment variables
