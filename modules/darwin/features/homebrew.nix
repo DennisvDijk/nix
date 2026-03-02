@@ -48,6 +48,7 @@ in
       casks = mkIf cfg.casks.enable [
         # Browsers
         "orion"
+        "brave-browser"
         "google-chrome"
         "firefox@nightly"
         

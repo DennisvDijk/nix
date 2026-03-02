@@ -8,7 +8,9 @@
   ];
 
   system.primaryUser = "dennisvandijk";
-  nix.enable = false;
+  nix.enable = true;
+  nix.package = pkgs.nixVersions.stable;
+  nix.enableFlakes = true;
   nixpkgs.config.allowUnfree = true;
 
   homebrew = {

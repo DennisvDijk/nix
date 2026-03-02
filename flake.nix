@@ -10,6 +10,8 @@
     flake-utils.url = "github:numtide/flake-utils";
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    mac-app-util.url = "github:hraban/mac-app-util";
+    cachix.url = "github:cachix/cachix";
   };
 
   outputs = { self, nixpkgs, nix-darwin, home-manager, flake-utils, sops-nix, ... }@inputs:
@@ -56,6 +58,7 @@
         modules = [
           ./hosts/${hostName}/home.nix
           sops-nix.homeManagerModules.sops
+          inputs.mac-app-util.homeManagerModules.default
         ];
       };
     }) [ "work" "personal" "template" ]);

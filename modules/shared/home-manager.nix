@@ -9,6 +9,7 @@
 
   # Enable Home Manager
   programs.home-manager.enable = true;
+  nix.package = pkgs.nix;
 
   # Session path for local bins
   home.sessionPath = [

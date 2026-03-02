@@ -63,7 +63,7 @@ in
     ];
 
     # AI tool configurations
-    home.file."${config.home.homeDirectory}/.config/opencode/opencode.json" = {
+    home.file.".config/opencode/opencode.json" = {
       source = config.lib.file.mkOutOfStoreSymlink
         "${config.home.homeDirectory}/.config/nix/modules/config/opencode/opencode.json";
     };

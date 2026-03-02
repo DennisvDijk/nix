@@ -1,13 +1,14 @@
 # hosts/personal/darwin.nix
 # Personal host Darwin configuration using feature flags
 
-{ config, pkgs, lib, username, ... }:
+{ config, pkgs, lib, username, inputs, ... }:
 
 {
   imports = [
     ../../modules/darwin/features  # Import Darwin feature modules
     ../../modules/shared/services/aerospace.nix
     ../../modules/shared/services/sketchybar.nix
+    inputs.mac-app-util.darwinModules.default
   ];
 
   # Host identification
@@ -26,6 +27,10 @@
   # MacBook gebruikt Determinate Nix, Mac Mini niet
   # Op Mac Mini: verander naar nix.enable = true
   nix.enable = false;  # false voor Determinate, true voor standaard Nix
+
+  # Binary cache for faster builds
+  nix.settings.substituters = [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
+  nix.settings.trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
 
   # Darwin feature flags
   my.darwin = {
