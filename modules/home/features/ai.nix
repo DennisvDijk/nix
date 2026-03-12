@@ -63,10 +63,8 @@ in
     ];
 
     # AI tool configurations
-    home.file.".config/opencode/opencode.json" = {
-      source = config.lib.file.mkOutOfStoreSymlink
-        "${config.home.homeDirectory}/.config/nix/modules/config/opencode/opencode.json";
-    };
+    # Note: OpenCode configuration is now managed by modules/shared/programs/opencode.nix
+    # which handles opencode.json, skills, agents, rules, and commands comprehensively
 
     # Shell aliases for AI tools
     programs.zsh.shellAliases = {

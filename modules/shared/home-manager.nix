@@ -1,7 +1,7 @@
 { config, pkgs, lib, username ? "dennisvandijk", homeDirectory ? "/Users/dennisvandijk", ... }:
 
 {
-  # Core Home Manager settings
+    # Core Home Manager settings
   home = {
     inherit username homeDirectory;
     stateVersion = "25.05";
