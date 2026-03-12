@@ -23,7 +23,7 @@
 let
   # Relative path from this module to the config directory in the repo root.
   # Adjust if you move this module to a different depth.
-  opencodeConfigDir = ../../../config/opencode;
+  opencodeConfigDir = ../../config/opencode;
   configContents = builtins.readDir opencodeConfigDir;
 
   # ---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ let
         (name: _: lib.nameValuePair
           ".config/opencode/skills/${name}"
           { 
-            source = "${opencodeConfigDir}/skills/${name}/SKILL.md"; 
+            source = "${opencodeConfigDir}/skills/${name}"; 
             recursive = true;         
           })
         dirs
