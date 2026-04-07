@@ -70,7 +70,7 @@ in
         "ollama-app"
         "lm-studio"
         "llamabarn"
-        "claude-code"
+        "claude"
         
         # Utilities
         "raycast"

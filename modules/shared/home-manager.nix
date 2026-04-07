@@ -13,6 +13,7 @@
 
   # Session path for local bins
   home.sessionPath = [
+    "${config.home.homeDirectory}/.cargo/bin"
     "${config.home.homeDirectory}/.local/bin"
     "${config.home.homeDirectory}/.lmstudio/bin"
   ];
@@ -42,7 +43,11 @@
     # === Development ===
     uv                      # Python package manager
     nodejs                  # Node.js
-    
+    cargo
+    rustc
+    rust-analyzer
+    rustfmt
+    clippy
     # === System ===
     fastfetch               # System info display
     
