@@ -40,9 +40,9 @@ in
       
       brews = mkIf cfg.brews.enable [
         # Only put here what CANNOT be in Nix
-        # Example: Tools that need specific macOS frameworks
-        # Note: opencode and claude-code are in shared/darwin.nix
+        # Note: opencode is in shared/darwin.nix
         "opencode"
+        "llama.cpp"  # For running models like Gemma directly
       ];
 
       casks = mkIf cfg.casks.enable [
@@ -65,9 +65,10 @@ in
         "iterm2"
         "orbstack"
         "wave"
+        "wezterm"  # Nix version doesn't create .app bundle for Dock
         
         # AI/ML
-        "ollama-app"
+        "ollama-app"  # Nix version available but cask has better GPU support
         "lm-studio"
         "llamabarn"
         "claude"
