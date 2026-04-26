@@ -44,8 +44,6 @@
     
     # ai = false;   # AI/ML tooling
     
-    # openclaw = false;  # OpenClaw AI assistant
-    
     # devtools = false;  # OpenCode DevTools
   };
 

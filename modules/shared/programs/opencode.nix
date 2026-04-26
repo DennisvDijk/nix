@@ -93,6 +93,21 @@ let
 
 in
 {
+  home.activation.backupExistingOpencodeFiles = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+    for relativePath in \
+      ".config/opencode/opencode.json" \
+      ".config/opencode/AGENTS.md"
+    do
+      targetPath="$HOME/$relativePath"
+
+      if [ -e "$targetPath" ] && [ ! -L "$targetPath" ]; then
+        backupPath="$targetPath.hm-backup-$(date +%Y%m%d-%H%M%S)"
+        echo "Backing up existing OpenCode file: $targetPath -> $backupPath"
+        mv "$targetPath" "$backupPath"
+      fi
+    done
+  '';
+
   home.file =
     coreEntries
     // skillEntries

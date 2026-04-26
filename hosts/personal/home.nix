@@ -83,14 +83,6 @@
       localLLMs.enable = true;
     };
     
-    # OpenClaw AI assistant - disabled by default
-    # Enable only on machines where you want to run OpenClaw
-    openclaw = {
-      enable = true;  # Set to false on other machines
-      buildImage = false;  # Set to true to build Docker image
-      configDir = "${config.home.homeDirectory}/.config/nix/hosts/personal/openclaw";
-    };
-    
     # OpenCode DevTools - Self-hosted AI development tools
     devtools = {
       enable = true;
@@ -116,24 +108,7 @@
     age.keyFile = "/Users/dennisvandijk/Library/Application Support/sops/age/keys.txt";
     defaultSopsFile = ../../secrets/example.yaml;
     
-    secrets = {
-      openclaw_api_key = {
-        sopsFile = ../../secrets/openclaw.yaml;
-        key = "openclaw_api_key";
-      };
-      telegram_bot_name = {
-        sopsFile = ../../secrets/openclaw.yaml;
-        key = "telegram_bot_name";
-      };
-      telegram_bot_token = {
-        sopsFile = ../../secrets/openclaw.yaml;
-        key = "telegram_bot_token";
-      };
-      telegram_chat_id = {
-        sopsFile = ../../secrets/openclaw.yaml;
-        key = "telegram_chat_id";
-      };
-    };
+    secrets = { };
   };
 
   # Personal-specific packages (things not covered by features)

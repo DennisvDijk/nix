@@ -36,13 +36,11 @@ in
   config = mkIf cfg.enable {
     programs.git = {
       enable = true;
-      
-      # User identity
-      userName = gitName;
-      userEmail = gitEmail;
-      
+
       # Git settings (new syntax)
       settings = {
+        user.name = gitName;
+        user.email = gitEmail;
         init.defaultBranch = "main";
         pull.rebase = true;
         push.autoSetupRemote = true;

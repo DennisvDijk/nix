@@ -83,7 +83,7 @@ in
       llm = "llm";
     };
 
-    programs.zsh.initExtra = ''
+    programs.zsh.initContent = lib.mkAfter ''
       # Claude Code completions (if available)
       if command -v claude &>/dev/null; then
         eval "$(claude --completion zsh 2>/dev/null || true)"

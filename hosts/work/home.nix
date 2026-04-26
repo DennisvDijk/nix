@@ -48,7 +48,6 @@
     dev.enable = false;
     k8s.enable = false;
     nh.enable = false;
-    openclaw.enable = false;
     devtools.enable = false;
   };
 

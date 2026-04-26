@@ -86,7 +86,7 @@ in
     ];
 
     # Docker/Colima integration
-    programs.zsh.initExtra = mkIf cfg.docker.enable ''
+    programs.zsh.initContent = mkIf cfg.docker.enable (lib.mkAfter ''
       # Colima auto-completion and aliases
       if command -v colima &>/dev/null; then
         eval "$(colima completion zsh)"
@@ -97,6 +97,6 @@ in
       alias dc='docker compose'
       alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
       alias dprune='docker system prune -af'
-    '';
+    '');
   };
 }

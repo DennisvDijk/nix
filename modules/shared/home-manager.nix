@@ -13,6 +13,8 @@
 
   # Session path for local bins
   home.sessionPath = [
+    "/opt/homebrew/bin"
+    "/opt/homebrew/sbin"
     "${config.home.homeDirectory}/.cargo/bin"
     "${config.home.homeDirectory}/.local/bin"
     "${config.home.homeDirectory}/.lmstudio/bin"
@@ -53,7 +55,6 @@
     
     # === Shells ===
     zsh                     # Zsh shell
-    zsh-autosuggestions     # Shell suggestions
     
     # === Network ===
     mosh                    # Mobile shell
