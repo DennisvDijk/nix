@@ -10,7 +10,7 @@
   system.primaryUser = "dennisvandijk";
   nix.enable = true;
   nix.package = pkgs.nixVersions.stable;
-  nix.enableFlakes = true;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.config.allowUnfree = true;
 
   homebrew = {
@@ -55,7 +55,6 @@
       "llamabarn"
       "wave"
       "parsec"
-      "stats"
       "blender"
       "emdash"
     ];

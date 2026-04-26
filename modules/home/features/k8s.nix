@@ -71,7 +71,7 @@ in
     ];
 
     # Kubernetes shell integration
-    programs.zsh.initExtra = ''
+    programs.zsh.initContent = lib.mkAfter ''
       # kubectl completion
       if command -v kubectl &>/dev/null; then
         eval "$(kubectl completion zsh)"

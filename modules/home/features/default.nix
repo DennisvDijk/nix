@@ -14,7 +14,6 @@
     ./ai.nix
     ./terminal.nix
     ./nh.nix
-    ./openclaw.nix
     ./devtools.nix
     ../../shared/ui/fonts.nix
     ../../shared/programs/opencode.nix

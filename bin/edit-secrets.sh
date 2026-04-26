@@ -4,7 +4,6 @@
 #
 # Gebruik:
 #   edit-secrets.sh                    # Bewerk standaard secrets/example.yaml
-#   edit-secrets.sh openclaw           # Bewerk secrets/openclaw.yaml
 #   edit-secrets.sh <naam>             # Bewerk secrets/<naam>.yaml
 #
 

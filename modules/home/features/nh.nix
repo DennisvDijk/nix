@@ -59,7 +59,7 @@ in
     };
 
     # Additional shell functions
-    programs.zsh.initExtra = ''
+    programs.zsh.initContent = lib.mkAfter ''
       # Nix flake helpers
       nix-check() {
         echo "Checking flake..."

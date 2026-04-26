@@ -83,7 +83,6 @@ in
         unrar
         rsync
         rclone
-        fd                # Already listed above but good for clarity
       ]))
       
       (mkIf cfg.systemTools.enable (with pkgs; [

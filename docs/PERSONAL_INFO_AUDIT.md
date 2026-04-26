@@ -60,15 +60,10 @@ All personal information has been identified and properly handled. True secrets 
 
 ### 5. **API Keys & Tokens** ✅ ALREADY SECURED
 **Files**:
-- `secrets/openclaw.yaml` - Encrypted
 - `secrets/example.yaml` - Encrypted
 
 **Information**:
-- openclaw_api_key
-- telegram_bot_token
-- telegram_bot_name
-- telegram_chat_id
-- gemini_api_key (optional)
+- API keys and tokens stored in encrypted secrets files
 
 **Resolution**:
 - Already in SOPS-encrypted files ✅
@@ -91,7 +86,6 @@ All personal information has been identified and properly handled. True secrets 
 ### Encrypted Secrets (API Keys, Tokens)
 ```
 secrets/
-├── openclaw.yaml       # Application secrets (encrypted)
 ├── example.yaml        # Example/template (encrypted)
 └── user.yaml           # Personal identifiers (encrypted)
 ```
@@ -113,7 +107,7 @@ my.user = {
 ## What Should Be in Secrets?
 
 ### ✅ Keep in SOPS (Encrypted)
-- API keys (OpenClaw, Gemini, etc.)
+- API keys
 - Bot tokens (Telegram, Discord, etc.)
 - Passwords and credentials
 - Private keys (SSH, GPG, Age)
