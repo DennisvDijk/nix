@@ -4,9 +4,7 @@
 keys:
   - &user_dennis_macbook age1ew02ftu6j8jrl4hdr497vuplqrz030h5l5tx630mxjje9948gdcsh5qjdz
   - &user_dennis_macmini age14qrqnrh9d7ap5c5srskechsr4ud4vnxwe69z0uryzja59xt5eehqf5c0u7
-  # TODO: add work laptop age key after first-time setup on work machine
-  # Generate with: age-keygen -o ~/Library/Application\ Support/sops/age/keys.txt
-  # Then add the PUBLIC key here as: - &user_dennis_worklaptop age1...
+  - &user_dennis_worklaptop age1veg4pp9muc6e2jyuacmdn0u7weqqhjx59ssu8rhttw8j38v3nc9s5mdjgp
 
 creation_rules:
   # Alles in secrets/ directory
@@ -15,3 +13,4 @@ creation_rules:
       - age:
           - *user_dennis_macbook
           - *user_dennis_macmini
+          - *user_dennis_worklaptop
