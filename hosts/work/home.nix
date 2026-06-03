@@ -104,8 +104,12 @@
     defaultSopsFile = ../../secrets/work-secrets.yaml;
 
     secrets = {
-      work_email    = { };
-      gitlab_host   = { };
+      work_email          = { };
+      gitlab_host         = { };
+      litellm_master_key  = { };
+      langfuse_public_key = { };
+      langfuse_secret_key = { };
+      aws_bedrock_role_arn = { };
     };
   };
 

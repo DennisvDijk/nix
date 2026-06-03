@@ -56,8 +56,38 @@
 
   # Personal-specific Homebrew casks
   homebrew.casks = lib.mkAfter [
-    "steam"
+    # Browsers
+    "orion"
+    "brave-browser"
+
+    # Communication
+    "signal"
+    "whatsapp"
+    "telegram-desktop"
+
+    # Media
+    "spotify"
     "vlc"
+
+    # Development
+    "wave"
+
+    # AI/ML
+    "ollama-app"
+    "lm-studio"
+    "llamabarn"
+    "claude"
+
+    # Utilities
+    "jordanbaird-ice"
+    "tailscale-app"
+    "parsec"
+
+    # Gaming/Fun
+    "steam"
+    "blender"
+    "discord"
+    "chatgpt"
     "emdash"
   ];
 

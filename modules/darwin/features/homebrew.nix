@@ -46,47 +46,20 @@ in
       ];
 
       casks = mkIf cfg.casks.enable [
-        # Browsers
-        "orion"
-        "brave-browser"
+        # Browsers (universal)
         "google-chrome"
         "firefox@nightly"
         
-        # Communication
-        "signal"
-        "whatsapp"
-        
-        # Media
-        "spotify"
-        "vlc"
-        
-        # Development
+        # Development (universal)
         "visual-studio-code"
         "iterm2"
         "orbstack"
-        "wave"
         "wezterm"  # Nix version doesn't create .app bundle for Dock
         
-        # AI/ML
-        "ollama-app"  # Nix version available but cask has better GPU support
-        "lm-studio"
-        "llamabarn"
-        "claude"
-        
-        # Utilities
+        # Utilities (universal)
         "raycast"
         "rectangle"
-        "jordanbaird-ice"
         "stats"
-        "tailscale-app"
-        "parsec"
-        
-        # Gaming/Fun
-        "steam"
-        "blender"
-        "discord"
-        "chatgpt"
-        "telegram-desktop"
       ];
 
       masApps = mkIf cfg.mas.enable {
