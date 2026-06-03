@@ -1,0 +1,57 @@
+{
+  "agents": {
+    "sisyphus": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "sisyphus-junior": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "oracle": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "explore": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "librarian": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "atlas": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "prometheus": {
+      "model": "ai-gateway/claude-opus-4.6-bedrock"
+    },
+    "metis": {
+      "model": "ai-gateway/claude-opus-4.7-bedrock"
+    },
+    "momus": {
+      "model": "ai-gateway/claude-opus-4.7-bedrock"
+    }
+  },
+  "categories": {
+    "quick": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "unspecified-low": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "unspecified-high": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "visual-engineering": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "ultrabrain": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "deep": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "artistry": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    },
+    "writing": {
+      "model": "ai-gateway/claude-haiku-4.5-bedrock"
+    }
+  }
+}

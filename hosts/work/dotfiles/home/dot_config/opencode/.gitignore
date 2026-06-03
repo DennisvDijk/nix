@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+bun.lock
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+*.env
+searxng/.env
+
+# Allow example environment files
+!.env.example
+!searxng/.env.example
+
+# Sensitive files
+*.pem
+*.key
+*credentials*
+*secret*
+*.p12
+*.pfx
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/

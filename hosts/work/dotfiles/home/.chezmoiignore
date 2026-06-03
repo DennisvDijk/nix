@@ -1,0 +1,7 @@
+# .chezmoiignore
+# Files chezmoi should not manage — add patterns here
+.DS_Store
+.zsh_history
+
+# Raycast extensions are managed by Raycast itself
+.config/raycast/extensions/

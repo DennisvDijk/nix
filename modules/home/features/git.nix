@@ -31,6 +31,7 @@ in
     lazygit.enable = mkEnableOption "lazygit TUI" // { default = true; };
     jujutsu.enable = mkEnableOption "jujutsu VCS" // { default = true; };
     githubCli.enable = mkEnableOption "GitHub CLI" // { default = true; };
+    gitlabCli.enable = mkEnableOption "GitLab CLI (glab)";
   };
 
   config = mkIf cfg.enable {
@@ -62,9 +63,13 @@ in
         # Better log
         log.decorate = "short";
         
-        # URL shortcuts
+        # URL shortcuts — GitHub
         url."https://github.com/".insteadOf = "gh:";
         url."git@github.com:".insteadOf = "ghs:";
+
+        # URL shortcuts — GitLab (SaaS only; self-hosted instance added via activation script)
+        url."https://gitlab.com/".insteadOf = "gl:";
+        url."git@gitlab.com:".insteadOf = "gls:";
         
         # Aliases
         alias = {
@@ -181,6 +186,21 @@ in
         gh-dash  # Dashboard for PRs and issues
         # gh-copilot - removed from nixpkgs, use 'github-copilot-cli' if needed
       ];
+    };
+
+    programs.glab = mkIf cfg.gitlabCli.enable {
+      enable = true;
+      settings = {
+        git_protocol = "ssh";
+        prompt = "enabled";
+        aliases = {
+          co = "mr checkout";
+          mrv = "mr view --web";
+          mrc = "mr create";
+        };
+        # NOTE: host is configured via SOPS activation script in hosts/work/home.nix
+        # to keep the self-hosted instance URL out of the repository
+      };
     };
 
     home.packages = mkIf cfg.jujutsu.enable [ pkgs.jujutsu ];

@@ -17,11 +17,19 @@
   outputs = { self, nixpkgs, nix-darwin, home-manager, flake-utils, sops-nix, ... }@inputs:
   let
     system = "aarch64-darwin";
-    username = "dennisvandijk";
-    homeDirectory = "/Users/dennisvandijk";
-    
+
+    # Per-host username — work laptop has a different macOS account name
+    hostUsers = {
+      personal = "dennisvandijk";
+      work     = "dennis.van.dijk";
+      template = "dennisvandijk";
+    };
+
     # Helper to create my.* namespace args
-    mkMyArgs = hostName: {
+    mkMyArgs = hostName:
+    let
+      username = hostUsers.${hostName};
+    in {
       inherit username hostName;
       isDarwin = true;
       isPersonal = hostName == "personal";
@@ -34,8 +42,9 @@
       name = hostName;
       value = nix-darwin.lib.darwinSystem {
         inherit system;
-        specialArgs = { 
-          inherit username inputs;
+        specialArgs = {
+          username = hostUsers.${hostName};
+          inherit inputs;
           my = mkMyArgs hostName;
         };
         modules = [ ./hosts/${hostName}/darwin.nix ];
@@ -51,8 +60,12 @@
           config.allowUnfree = true;
           config.allowUnsupportedSystem = true;
         };
-        extraSpecialArgs = { 
-          inherit inputs username homeDirectory hostName;
+        extraSpecialArgs =
+        let
+          username = hostUsers.${hostName};
+        in {
+          inherit inputs username hostName;
+          homeDirectory = "/Users/${username}";
           my = mkMyArgs hostName;
         };
         modules = [

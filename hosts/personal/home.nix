@@ -41,6 +41,7 @@
       lazygit.enable = true;
       jujutsu.enable = true;
       githubCli.enable = true;
+      gitlabCli.enable = false;
     };
     
     terminal = {
