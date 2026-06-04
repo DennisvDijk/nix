@@ -166,19 +166,24 @@
 
   # Activation: deploy dotfiles via chezmoi pointing to local nix repo source
   # Dotfiles live in hosts/work/dotfiles/ — versioned together with this nix config
-  # On first run: initialises chezmoi from the local source and applies
+  # On first run: initialises chezmoi from the local source and applies (with --force
+  # so pre-existing handwritten dotfiles get overwritten by the repo-managed versions).
   # To update dotfiles: edit files in hosts/work/dotfiles/, then run 'chezmoi apply'
+  # (or rebuild — this activation will re-apply on every home-manager switch).
   home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     dotfiles_source="${config.home.homeDirectory}/.config/nix/hosts/work/dotfiles"
     chezmoi_dir="${config.home.homeDirectory}/.local/share/chezmoi"
     if [ -d "$dotfiles_source" ]; then
       if [ ! -d "$chezmoi_dir" ]; then
         echo "chezmoi: initialising from local nix repo source..."
-        ${pkgs.chezmoi}/bin/chezmoi init --source "$dotfiles_source" --apply
+        ${pkgs.chezmoi}/bin/chezmoi init --source "$dotfiles_source" --apply --force
       else
-        # Already initialised — apply any changes from the nix repo
-        ${pkgs.chezmoi}/bin/chezmoi apply --source "$dotfiles_source"
+        # Already initialised — apply any changes from the nix repo (force overwrites
+        # local drift; the nix repo is the single source of truth for these files).
+        ${pkgs.chezmoi}/bin/chezmoi apply --source "$dotfiles_source" --force
       fi
+    else
+      echo "chezmoi: dotfiles_source $dotfiles_source not found — skipping (symlink ~/.config/nix to your repo checkout)"
     fi
   '';
 
