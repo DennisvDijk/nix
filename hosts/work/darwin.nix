@@ -7,7 +7,8 @@
   imports = [
     ../../modules/darwin/features
     inputs.mac-app-util.darwinModules.default
-    # No aerospace/sketchybar — those are personal desktop tools
+    # No sketchybar — that's a personal desktop tool
+    # Aerospace is installed via homebrew cask below; config managed by chezmoi
   ];
 
   # Host identification
@@ -71,6 +72,10 @@
 
     # Kubernetes GUI
     "lens"
+
+    # Window manager — config lives in hosts/work/dotfiles/home/dot_aerospace.toml
+    # (chezmoi renders it to ~/.aerospace.toml)
+    "nikitabobko/tap/aerospace"
   ];
 
   # Work-specific Homebrew brews (CLI tools not in nixpkgs)
