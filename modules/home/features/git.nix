@@ -4,7 +4,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  inherit (lib) mkEnableOption mkIf;
+  inherit (lib) mkEnableOption mkIf mkMerge;
   cfg = config.my.features.git;
   
   # Get git identity from user config
