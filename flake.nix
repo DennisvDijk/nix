@@ -21,7 +21,7 @@
     # Per-host username — work laptop has a different macOS account name
     hostUsers = {
       personal = "dennisvandijk";
-      work     = "dennis.van.dijk";
+      work     = "Dennis.van.Dijk";
       template = "dennisvandijk";
     };
 
