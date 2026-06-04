@@ -38,12 +38,11 @@ cwd_filter = []
 # ctrl_n_shortcuts = true
 
 ## Statistics
-stats = {
-    enabled = true,
-}
+[stats]
+enabled = true
 
 ## Daemon mode (better performance)
-daemon = {
-    enabled = false,  # Enable for faster performance: `atuin daemon`
-    sync_frequency = 300,
-}
+# Enable daemon = true for faster performance: `atuin daemon`
+[daemon]
+enabled = false
+sync_frequency = 300
