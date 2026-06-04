@@ -58,23 +58,67 @@
   # Work-specific Homebrew casks
   # NOTE: awscli2 + azure-cli are installed via Nix (k8s.cloud.enable) — not via brew
   # NOTE: Microsoft Office is managed by Enexis Intune — not via brew
+  # NOTE: Teams + Zoom intentionally NOT installed (use browser/web client)
+  # NOTE: Universal casks (chrome, firefox-nightly, vscode, iterm2, orbstack,
+  #       wezterm, raycast, rectangle, stats) live in modules/darwin/features/homebrew.nix
   homebrew.casks = lib.mkAfter [
-    # Communication
+    # ── Communication ──────────────────────────────────────────────
     "slack"
-    "zoom"
-    "microsoft-teams"
+    "signal"
+    "telegram-desktop"
 
-    # Browser
+    # ── Browsers ───────────────────────────────────────────────────
     "arc"
 
-    # AWS — aws-vault is not in nixpkgs, brew is appropriate here
+    # ── Terminals ──────────────────────────────────────────────────
+    "warp"
+
+    # ── AWS / Cloud ────────────────────────────────────────────────
     "aws-vault"
 
-    # Kubernetes GUI
+    # ── Kubernetes / Containers ────────────────────────────────────
     "lens"
+    "podman-desktop"
+    "rancher"
 
-    # Window manager — config lives in hosts/work/dotfiles/home/dot_aerospace.toml
-    # (chezmoi renders it to ~/.aerospace.toml)
+    # ── Database / API tools ───────────────────────────────────────
+    "postgres-app"
+    "pgadmin4"
+    "dbeaver-community"
+    "azure-data-studio"
+    "bruno"
+
+    # ── AI / LLM tools ─────────────────────────────────────────────
+    # Local LLMs (ollama/lm-studio): data stays on-device → residency-safe
+    "claude-code"
+    "ollama"
+    "lm-studio"
+    "opencode-desktop"
+    "handy"
+
+    # ── Productivity / Notes ───────────────────────────────────────
+    "drawio"
+    "obsidian"
+    "logseq"
+
+    # ── Utilities / Menubar ────────────────────────────────────────
+    "bitwarden"
+    "jordanbaird-ice"
+    "vacuum"
+
+    # ── Media ──────────────────────────────────────────────────────
+    "vlc"
+    "obs"
+    "gimp"
+    "anki"
+
+    # ── Fonts ──────────────────────────────────────────────────────
+    "font-hack-nerd-font"
+
+    # ── Dev environments ───────────────────────────────────────────
+    "flox"
+
+    # ── Window manager — config in hosts/work/dotfiles/home/dot_aerospace.toml
     "nikitabobko/tap/aerospace"
   ];
 

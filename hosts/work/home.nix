@@ -25,13 +25,14 @@
   my.features = {
     shell = {
       enable = true;
-      # Work host: chezmoi owns ~/.zshrc and ~/.config/starship.toml
-      # (see hosts/work/dotfiles/home/dot_zshrc.tmpl + dot_config/starship.toml).
-      # Disable home-manager's zsh + starship file generation to avoid conflicts.
+      # Work host: chezmoi owns ~/.zshrc, ~/.config/starship.toml,
+      # and ~/.config/atuin/config.toml (see hosts/work/dotfiles/home/).
+      # Disable home-manager's file generation for these to avoid conflicts;
+      # binaries are still installed via home.packages below.
       starship.enable = false;
       direnv.enable = true;
       zoxide.enable = true;
-      atuin.enable = true;
+      atuin.enable = false;
     };
 
     cli.enable = true;
@@ -194,13 +195,20 @@
     zsh-autosuggestions
     zsh-syntax-highlighting
     starship
+    atuin
+
+    # Shell history layering (zshrc has conditional integrations for all three)
+    mcfly
+    hstr
+    thefuck
 
     # Media / general utility
     ffmpeg
     imagemagick
     mosh
 
-    # AWS SSM — installed via Homebrew (not in nixpkgs)
+    # AWS SSM — not included in k8s.cloud feature
+    session-manager-plugin
 
     # Dotfiles management
     chezmoi
