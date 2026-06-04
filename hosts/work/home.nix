@@ -25,7 +25,10 @@
   my.features = {
     shell = {
       enable = true;
-      starship.enable = true;
+      # Work host: chezmoi owns ~/.zshrc and ~/.config/starship.toml
+      # (see hosts/work/dotfiles/home/dot_zshrc.tmpl + dot_config/starship.toml).
+      # Disable home-manager's zsh + starship file generation to avoid conflicts.
+      starship.enable = false;
       direnv.enable = true;
       zoxide.enable = true;
       atuin.enable = true;
@@ -84,6 +87,11 @@
 
     devtools.enable = false;      # Self-hosted opencode-tools stack is personal-only
   };
+
+  # Work host: chezmoi owns ~/.zshrc — disable home-manager's zsh file generation.
+  # The zsh package itself is still installed (via core packages), and plugins like
+  # autosuggestions/syntax-highlighting are sourced manually in dot_zshrc.tmpl.
+  programs.zsh.enable = lib.mkForce false;
 
   # User identity — email loaded via SOPS, not plaintext
   my.user = {
@@ -176,6 +184,12 @@
 
   # Work-specific packages (beyond features)
   home.packages = with pkgs; [
+    # Shell (chezmoi-managed config — see programs.zsh.enable override above)
+    zsh
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    starship
+
     # Media / general utility
     ffmpeg
     imagemagick
@@ -187,11 +201,7 @@
     chezmoi
   ];
 
-  # Work environment variables
-  programs.zsh.initContent = lib.mkAfter ''
-    export WORK_ENV=1
-    export NIX_HOST="${hostName}"
-    export AWS_DEFAULT_REGION="eu-west-1"    # Data residency: EU only (Bedrock eu-west-1)
-    export AWS_REGION="eu-west-1"
-  '';
+  # Work environment variables are exported via chezmoi-managed ~/.zshrc
+  # (see hosts/work/dotfiles/home/dot_zshrc.tmpl — WORK_ENV, NIX_HOST, AWS_*).
+  # Host name and username are interpolated by chezmoi templates from ~/.config/chezmoi.
 }

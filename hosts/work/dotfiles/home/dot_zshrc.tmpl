@@ -1,12 +1,282 @@
-# dot_zshrc.tmpl
-# Work-specific zsh config managed by chezmoi
-# This file is templated — chezmoi renders it to ~/.zshrc
-#
-# Add work-specific shell config here that doesn't belong in the nix home-manager config:
-# - Company proxy settings
-# - Internal tool aliases
-# - Project-specific shell functions
-#
-# Example:
-# export PROXY_URL="http://proxy.internal:3128"
-# alias vpn='openconnect vpn.enexis.nl'
+# ============================================
+# Zsh Configuration (managed by chezmoi via nix)
+# ============================================
+# Source: hosts/work/dotfiles/home/dot_zshrc.tmpl
+# Edit here, then run `chezmoi apply` (or rebuild home-manager).
+
+# Path Configuration
+export PATH="$HOME/bin:/usr/local/bin:$PATH"
+
+# ============================================
+# History Configuration
+# ============================================
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt SHARE_HISTORY
+
+# ============================================
+# Directory Navigation Aliases
+# ============================================
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias ~='cd ~'
+alias -- -='cd -'
+
+# ============================================
+# Modern CLI Tools Configuration
+# ============================================
+
+# eza - modern ls replacement with icons
+if command -v eza &> /dev/null; then
+  alias ls='eza --icons'
+  alias ll='eza --icons --long --all --header --git'
+  alias la='eza --icons --all'
+  alias l='eza --icons'
+  alias tree='eza --icons --tree'
+  alias lt='eza --icons --tree --level=2'
+else
+  # Fallback to standard ls if eza not installed
+  alias ls='ls -G'
+  alias ll='ls -lah'
+  alias la='ls -A'
+  alias l='ls -CF'
+fi
+
+# bat - better cat with syntax highlighting
+if command -v bat &> /dev/null; then
+  alias cat='bat --style=auto'
+  alias bcat='bat --style=plain'  # bat without decorations
+  export BAT_THEME="Catppuccin Mocha"
+  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+fi
+
+# fd - better find
+if command -v fd &> /dev/null; then
+  alias find='fd'
+fi
+
+# ripgrep - better grep
+if command -v rg &> /dev/null; then
+  alias grep='rg'
+  alias oldgrep='command grep --color=auto'  # Keep original grep available
+fi
+
+# dust - better du (disk usage)
+if command -v dust &> /dev/null; then
+  alias du='dust'
+  alias olddu='command du'
+fi
+
+# duf - better df (disk free)
+if command -v duf &> /dev/null; then
+  alias df='duf'
+  alias olddf='command df'
+fi
+
+# procs - better ps
+if command -v procs &> /dev/null; then
+  alias ps='procs'
+  alias oldps='command ps'
+fi
+
+# Standard file operations
+alias mkdir='mkdir -pv'
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias rm='rm -i'
+
+# ============================================
+# Git Aliases
+# ============================================
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gaa='git add .'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gp='git push'
+alias gpl='git pull'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gl='git log --oneline --graph --decorate'
+alias gco='git checkout'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gst='git stash'
+alias gstp='git stash pop'
+
+# ============================================
+# Development Aliases
+# ============================================
+alias py='python3'
+alias pip='pip3'
+alias tf='terraform'
+alias k='kubectl'
+alias d='docker'
+alias dc='docker-compose'
+alias dps='docker ps'
+alias dimg='docker images'
+
+# ============================================
+# System Aliases
+# ============================================
+alias c='clear'
+alias h='history'
+alias j='jobs -l'
+alias path='echo -e ${PATH//:/\\n}'
+alias now='date +"%T"'
+alias nowdate='date +"%d-%m-%Y"'
+
+# ============================================
+# Quick Edit Aliases
+# ============================================
+alias zshconfig='${EDITOR:-nano} ~/.zshrc'
+alias zshreload='source ~/.zshrc'
+
+# ============================================
+# Network Aliases
+# ============================================
+alias myip='curl ifconfig.me'
+alias ports='netstat -tulanp'
+
+# ============================================
+# Safety Aliases
+# ============================================
+alias wget='wget -c'
+
+# ============================================
+# Smart CLI Tools Integration
+# ============================================
+
+# zoxide - smarter cd command (learns your habits)
+if command -v zoxide &> /dev/null; then
+  eval "$(zoxide init zsh)"
+  alias cd='z'
+  alias cdi='zi'  # interactive selection
+fi
+
+# fzf - fuzzy finder
+if command -v fzf &> /dev/null; then
+  # Set up fzf key bindings and fuzzy completion
+  source <(fzf --zsh)
+
+  # Use fd for fzf if available
+  if command -v fd &> /dev/null; then
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+  fi
+
+  # fzf theme (Catppuccin Mocha)
+  export FZF_DEFAULT_OPTS=" \
+    --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+    --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+    --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+fi
+
+# thefuck - corrects your previous command
+if command -v thefuck &> /dev/null; then
+  eval $(thefuck --alias)
+  alias f='fuck'
+fi
+
+# direnv - per-directory environment loader (nix-direnv enabled via home-manager)
+if command -v direnv &> /dev/null; then
+  eval "$(direnv hook zsh)"
+fi
+
+# ============================================
+# Environment Variables
+# ============================================
+
+# OpenCode AI Gateway Configuration (Enexis platform)
+export ENEXIS_AI_GATEWAY_URL="https://api.ai.enexis.nl"
+export ENEXIS_AI_GATEWAY_NAME="Enexis AI Gateway, hell yes."
+
+# Work environment (Enexis AI Platform)
+export WORK_ENV=1
+export NIX_HOST="{{ .chezmoi.hostname }}"
+# Data residency: EU only (Bedrock eu-west-1, Azure OpenAI westeurope)
+export AWS_DEFAULT_REGION="eu-west-1"
+export AWS_REGION="eu-west-1"
+
+# ============================================
+# Shell History Tools
+# ============================================
+# Keybinding Summary:
+#   Ctrl+R      → Atuin (primary, fuzzy search with stats)
+#   Ctrl+H      → HSTR (visual history browser)
+#   Ctrl+Space  → mcfly (neural network suggestions)
+#   Up/Down     → Atuin inline search
+
+# Atuin - magical shell history (primary tool)
+if command -v atuin &> /dev/null; then
+  eval "$(atuin init zsh --disable-up-arrow)"
+  bindkey '^[[A' atuin-up-search
+  bindkey '^[OA' atuin-up-search
+fi
+
+# mcfly - neural network powered history suggestions
+if command -v mcfly &> /dev/null; then
+  export MCFLY_KEY_SCHEME=vim
+  export MCFLY_FUZZY=2
+  export MCFLY_RESULTS=50
+  export MCFLY_INTERFACE_VIEW=BOTTOM
+  export MCFLY_DISABLE_MENU=FALSE
+  eval "$(mcfly init zsh)"
+  bindkey -r '^R'                    # Remove mcfly's Ctrl+R binding (atuin claims it)
+  bindkey '^ ' mcfly-history-widget  # Ctrl+Space for mcfly
+fi
+
+# HSTR - visual history browser with favorites
+if command -v hstr &> /dev/null; then
+  export HSTR_CONFIG=hicolor,case-sensitive,raw-history-view
+  bindkey -s '\C-h' '\C-a hstr -- \C-j'
+fi
+
+# ============================================
+# Starship Prompt
+# ============================================
+if command -v starship &> /dev/null; then
+  eval "$(starship init zsh)"
+fi
+
+# ============================================
+# Zsh Plugins (installed via nix home-manager → ~/.nix-profile)
+# ============================================
+# zsh-autosuggestions: ghosted command suggestions from history
+for _zash in \
+  "$HOME/.nix-profile/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"; do
+  [ -f "$_zash" ] && source "$_zash" && break
+done
+
+# zsh-syntax-highlighting: must be sourced LAST
+for _zsh in \
+  "$HOME/.nix-profile/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
+  "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"; do
+  [ -f "$_zsh" ] && source "$_zsh" && break
+done
+unset _zash _zsh
+
+# Completion system
+autoload -Uz compinit && compinit -C
+
+# ============================================
+# Tool-managed PATH additions (idempotent)
+# ============================================
+
+# LM Studio CLI (lms)
+{{- if stat (joinPath .chezmoi.homeDir ".lmstudio/bin") }}
+export PATH="$PATH:{{ .chezmoi.homeDir }}/.lmstudio/bin"
+{{- end }}
+
+# Rancher Desktop
+{{- if stat (joinPath .chezmoi.homeDir ".rd/bin") }}
+export PATH="{{ .chezmoi.homeDir }}/.rd/bin:$PATH"
+{{- end }}
