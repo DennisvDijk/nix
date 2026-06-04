@@ -73,6 +73,12 @@
     "lens"
   ];
 
+  # Work-specific Homebrew brews (CLI tools not in nixpkgs)
+  homebrew.brews = lib.mkAfter [
+    # AWS SSM Session Manager plugin — not available in nixpkgs
+    "session-manager-plugin"
+  ];
+
   # Environment variables
   environment.variables = {
     WORK_ENV = lib.mkForce "1";
