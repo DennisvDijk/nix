@@ -137,7 +137,7 @@
   '';
 
   # Activation: write glab config with self-hosted host from SOPS
-  # programs.glab.settings writes the base config; this appends the host section
+  # Base config is in modules/home/features/git.nix; this appends the host section
   home.activation.glabHostConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     host=$(cat "${config.sops.secrets.gitlab_host.path}" 2>/dev/null || echo "")
     if [ -n "$host" ]; then

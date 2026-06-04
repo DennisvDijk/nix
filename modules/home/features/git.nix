@@ -190,17 +190,20 @@ in
 
     programs.glab = mkIf cfg.gitlabCli.enable {
       enable = true;
-      settings = {
-        git_protocol = "ssh";
-        prompt = "enabled";
-        aliases = {
-          co = "mr checkout";
-          mrv = "mr view --web";
-          mrc = "mr create";
-        };
-        # NOTE: host is configured via SOPS activation script in hosts/work/home.nix
-        # to keep the self-hosted instance URL out of the repository
-      };
+      # NOTE: settings option not available in all home-manager versions
+      # Config is written via home.file below for upstream compatibility
+    };
+
+    # glab config written directly for upstream home-manager compatibility
+    home.file.".config/glab-cli/config.yml" = mkIf cfg.gitlabCli.enable {
+      text = ''
+        git_protocol: ssh
+        prompt: enabled
+        aliases:
+          co: mr checkout
+          mrv: mr view --web
+          mrc: mr create
+      '';
     };
 
     home.packages = mkIf cfg.jujutsu.enable [ pkgs.jujutsu ];
