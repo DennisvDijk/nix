@@ -22,7 +22,6 @@ in
         # AI coding assistants from Nix (not Homebrew!)
         # claude-code         # Claude Code CLI - temporarily disabled due to npm registry connection issues
         codex               # OpenAI Codex CLI
-        aider-chat          # AI pair programming
         gemini-cli          # Google Gemini CLI
         
         # OpenCode (your own tool!)
@@ -70,9 +69,6 @@ in
     programs.zsh.shellAliases = {
       # Claude Code - temporarily disabled
       # cc = "claude-code";
-      
-      # Aider
-      ai = "aider";
       
       # Ollama shortcuts
       oll = "ollama";

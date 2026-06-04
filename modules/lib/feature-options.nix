@@ -19,7 +19,7 @@ in
     terminal = mkFeatureOption "terminal emulators (kitty, wezterm, alacritty)";
     k8s = mkFeatureOption "Kubernetes tools (kubectl, k9s, helm)";
     dev = mkFeatureOption "development tools (docker, node, uv, gh)";
-    ai = mkFeatureOption "AI/ML tooling (claude-code, codex, aider)";
+    ai = mkFeatureOption "AI/ML tooling (claude-code, codex, gemini-cli)";
     ops = mkFeatureOption "ops/networking tools (nmap, iperf3)";
     darwin = mkFeatureOption "macOS-specific configuration";
     homebrew = mkFeatureOption "Homebrew integration";

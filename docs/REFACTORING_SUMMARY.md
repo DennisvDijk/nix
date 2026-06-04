@@ -37,7 +37,7 @@ modules/
 │       ├── git.nix             # Git + delta + lazygit + gh
 │       ├── dev.nix             # Docker, node, python, uv
 │       ├── k8s.nix             # kubectl, k9s, helm
-│       ├── ai.nix              # claude-code, codex, aider, gemini-cli
+│       ├── ai.nix              # claude-code, codex, gemini-cli
 │       ├── terminal.nix        # wezterm, alacritty, kitty
 │       └── nh.nix              # Nix helper with aliases
 └── darwin/
@@ -77,7 +77,7 @@ nfu   # nix flake update
 1. ✅ All CLI tools (bat, eza, fd, ripgrep, fzf, etc.)
 2. ✅ Development tools (docker, node, uv, ruff)
 3. ✅ Kubernetes tools (kubectl, k9s, helm)
-4. ✅ AI CLI tools (claude-code, codex, aider)
+4. ✅ AI CLI tools (claude-code, codex, gemini-cli)
 5. ✅ Terminal emulators (wezterm, alacritty, kitty)
 6. ✅ Git tools (delta, lazygit, gh)
 7. ✅ System monitoring (bottom, btop, fastfetch)
