@@ -188,24 +188,13 @@ in
       ];
     };
 
-    programs.glab = mkIf cfg.gitlabCli.enable {
-      enable = true;
-      # NOTE: settings option not available in all home-manager versions
-      # Config is written via home.file below for upstream compatibility
-    };
+    # TODO: glab config — disabled due to upstream home-manager compatibility
+    # Re-enable after verifying programs.glab.settings support in target version
+    # home.file.".config/glab-cli/config.yml" = mkIf cfg.gitlabCli.enable { ... };
 
-    # glab config written directly for upstream home-manager compatibility
-    home.file.".config/glab-cli/config.yml" = mkIf cfg.gitlabCli.enable {
-      text = ''
-        git_protocol: ssh
-        prompt: enabled
-        aliases:
-          co: mr checkout
-          mrv: mr view --web
-          mrc: mr create
-      '';
-    };
-
-    home.packages = mkIf cfg.jujutsu.enable [ pkgs.jujutsu ];
+    home.packages = mkMerge [
+      (mkIf cfg.jujutsu.enable [ pkgs.jujutsu ])
+      (mkIf cfg.gitlabCli.enable [ pkgs.glab ])
+    ];
   };
 }

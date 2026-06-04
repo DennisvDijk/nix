@@ -136,25 +136,25 @@
     fi
   '';
 
-  # Activation: write glab config with self-hosted host from SOPS
-  # Base config is in modules/home/features/git.nix; this appends the host section
-  home.activation.glabHostConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    host=$(cat "${config.sops.secrets.gitlab_host.path}" 2>/dev/null || echo "")
-    if [ -n "$host" ]; then
-      glab_config="${config.home.homeDirectory}/.config/glab-cli/config.yml"
-      mkdir -p "$(dirname "$glab_config")"
-      # Only add hosts block if not already present for this host
-      if ! grep -q "$host" "$glab_config" 2>/dev/null; then
-        cat >> "$glab_config" << EOF
-hosts:
-  $host:
-    token: ""
-    git_protocol: ssh
-    api_protocol: https
-EOF
-      fi
-    fi
-  '';
+  # TODO: glab config activation — disabled due to upstream home-manager compatibility
+  # Re-enable after programs.glab.settings is supported in target home-manager version
+  #
+  # home.activation.glabHostConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  #   host=$(cat "${config.sops.secrets.gitlab_host.path}" 2>/dev/null || echo "")
+  #   if [ -n "$host" ]; then
+  #     glab_config="${config.home.homeDirectory}/.config/glab-cli/config.yml"
+  #     mkdir -p "$(dirname "$glab_config")"
+  #     if ! grep -q "$host" "$glab_config" 2>/dev/null; then
+  #       cat >> "$glab_config" << EOF
+  # hosts:
+  #   $host:
+  #     token: ""
+  #     git_protocol: ssh
+  #     api_protocol: https
+  # EOF
+  #     fi
+  #   fi
+  # '';
 
   # Activation: deploy dotfiles via chezmoi pointing to local nix repo source
   # Dotfiles live in hosts/work/dotfiles/ — versioned together with this nix config
