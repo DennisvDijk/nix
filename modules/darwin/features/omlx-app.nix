@@ -1,0 +1,55 @@
+{ config, pkgs, lib, ... }:
+
+let
+  omlx-app = pkgs.stdenv.mkDerivation rec {
+    pname = "omlx-app";
+    version = "0.4.1";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/jundot/omlx/releases/download/v${version}/oMLX-${version}-macos15-sequoia.dmg";
+      sha256 = "1cxjvka2rqpvh43rfnvgydp9kl7j06qkbc698dmq3fp9933zv6xy";
+    };
+
+    # hdiutil requires macOS system services; disable sandbox for this derivation
+    __noChroot = true;
+
+    buildInputs = [ pkgs.rsync ];
+
+    buildPhase = ''
+      mnt=$(mktemp -d)
+      /usr/bin/hdiutil attach -readonly -nobrowse -mountpoint "$mnt" "$src"
+      mkdir -p "$out/Applications"
+      cp -R "$mnt/oMLX.app" "$out/Applications/"
+      /usr/bin/hdiutil detach "$mnt"
+      rmdir "$mnt"
+    '';
+
+    dontUnpack = true;
+    dontConfigure = true;
+    dontInstall = true;
+
+    meta = {
+      description = "oMLX - LLM inference server with native macOS UI";
+      homepage = "https://github.com/jundot/omlx";
+      platforms = [ "aarch64-darwin" ];
+    };
+  };
+in
+{
+  options.my.darwin.omlx-app = {
+    enable = lib.mkEnableOption "oMLX macOS app (.dmg) managed via Nix" // { default = true; };
+  };
+
+  config = lib.mkIf config.my.darwin.omlx-app.enable {
+    # Copy the .app bundle to /Applications/ on first install only.
+    # After that, Sparkle (built-in auto-updater) handles upgrades.
+    # If you ever need to force a reinstall from Nix, delete
+    # /Applications/oMLX.app and run darwin-rebuild switch.
+    system.activationScripts.applications.text = lib.mkAfter ''
+      if [ ! -d "/Applications/oMLX.app" ]; then
+        echo "Installing oMLX.app to /Applications..."
+        ${pkgs.rsync}/bin/rsync -a --delete "${omlx-app}/Applications/oMLX.app/" "/Applications/oMLX.app/"
+      fi
+    '';
+  };
+}

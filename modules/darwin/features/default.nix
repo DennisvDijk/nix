@@ -7,6 +7,7 @@
   imports = [
     ./defaults.nix
     ./homebrew.nix
+    ./omlx-app.nix
   ];
   
   # Darwin-specific options namespace

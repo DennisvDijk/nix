@@ -43,6 +43,7 @@ in
         # Note: opencode is in shared/darwin.nix
         "opencode"
         "llama.cpp"  # For running models like Gemma directly
+        "omlx"
       ];
 
       casks = mkIf cfg.casks.enable [
@@ -71,6 +72,10 @@ in
       taps = [
         # "homebrew/cask-versions"  # Deprecated - merged into homebrew/cask
         # "homebrew/cask-fonts"     # Deprecated - use font- prefixed casks directly
+        {
+          name = "jundot/omlx";
+          clone_target = "https://github.com/jundot/omlx";
+        }
       ];
     };
 

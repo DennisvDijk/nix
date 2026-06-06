@@ -280,3 +280,18 @@ export PATH="$PATH:{{ .chezmoi.homeDir }}/.lmstudio/bin"
 {{- if stat (joinPath .chezmoi.homeDir ".rd/bin") }}
 export PATH="{{ .chezmoi.homeDir }}/.rd/bin:$PATH"
 {{- end }}
+
+# ============================================
+# Nix Rebuild Helper
+# ============================================
+nix-rebuild() {
+    local host="${NIX_HOST:-work}"
+    echo "🔨 Rebuilding darwin system for host: $host"
+
+    # Auto-check oMLX updates before rebuild (prompts with 15s timeout; defaults to no change)
+    if [ -x "$HOME/.config/nix/bin/update-omlx.sh" ]; then
+        "$HOME/.config/nix/bin/update-omlx.sh"
+    fi
+
+    sudo darwin-rebuild switch --flake ~/.config/nix#$host
+}

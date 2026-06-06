@@ -120,9 +120,21 @@
     mosh
   ];
 
-  # Zsh environment variables for personal host
+  # Zsh environment variables + rebuild helper for personal host
   programs.zsh.initContent = lib.mkAfter ''
     export PERSONAL_ENV=1
     export NIX_HOST="${hostName}"
+
+    nix-rebuild() {
+      local host=''${NIX_HOST:-personal}
+      echo "🔨 Rebuilding darwin system for host: $host"
+
+      # Auto-check oMLX updates before rebuild (prompts with 15s timeout; defaults to no change)
+      if [ -x "${config.home.homeDirectory}/.config/nix/bin/update-omlx.sh" ]; then
+        "${config.home.homeDirectory}/.config/nix/bin/update-omlx.sh"
+      fi
+
+      sudo darwin-rebuild switch --flake ~/.config/nix#$host
+    }
   '';
 }
