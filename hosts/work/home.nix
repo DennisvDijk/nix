@@ -200,7 +200,7 @@
     # Shell history layering (zshrc has conditional integrations for all three)
     mcfly
     hstr
-    thefuck
+    pay-respects
 
     # Media / general utility
     ffmpeg
