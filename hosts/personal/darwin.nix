@@ -57,6 +57,7 @@
   # Personal-specific Homebrew casks
   homebrew.casks = lib.mkAfter [
     # Browsers
+    "arc"
     "orion"
     "brave-browser"
 
