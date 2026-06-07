@@ -207,8 +207,7 @@
     imagemagick
     mosh
 
-    # AWS SSM — not included in k8s.cloud feature
-    session-manager-plugin
+    # AWS SSM — installed via Homebrew (see hosts/work/darwin.nix)
 
     # Dotfiles management
     chezmoi
