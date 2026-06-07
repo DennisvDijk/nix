@@ -120,6 +120,7 @@
 
     # ── Window manager — config in hosts/work/dotfiles/home/dot_aerospace.toml
     "nikitabobko/tap/aerospace"
+    "cmux"
   ];
 
   # Work-specific Homebrew brews (CLI tools not in nixpkgs)

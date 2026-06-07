@@ -24,39 +24,42 @@ in
       # Config is managed via home.file below for full Lua control
     };
 
-    home.file.".config/wezterm/wezterm.lua".text = lib.mkIf cfg.wezterm.enable ''
-      local wezterm = require 'wezterm'
+    home.file.".config/wezterm/wezterm.lua" = lib.mkIf cfg.wezterm.enable {
+      force = true;
+      text = ''
+        local wezterm = require 'wezterm'
 
-      return {
-        -- Catppuccin Mocha theme
-        color_scheme = 'Catppuccin Mocha',
+        return {
+          -- Catppuccin Mocha theme
+          color_scheme = 'Catppuccin Mocha',
 
-        -- Font configuration
-        font = wezterm.font('JetBrainsMono Nerd Font'),
-        font_size = 13.0,
+          -- Font configuration
+          font = wezterm.font('JetBrainsMono Nerd Font'),
+          font_size = 13.0,
 
-        -- Window settings
-        window_decorations = 'RESIZE',
-        window_background_opacity = 0.95,
+          -- Window settings
+          window_decorations = 'RESIZE',
+          window_background_opacity = 0.95,
 
-        -- Tab bar
-        enable_tab_bar = true,
-        use_fancy_tab_bar = false,
-        hide_tab_bar_if_only_one_tab = true,
+          -- Tab bar
+          enable_tab_bar = true,
+          use_fancy_tab_bar = false,
+          hide_tab_bar_if_only_one_tab = true,
 
-        -- Scrollback
-        scrollback_lines = 10000,
+          -- Scrollback
+          scrollback_lines = 10000,
 
-        -- Key bindings
-        keys = {
-          { key = 't', mods = 'CMD', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
-          { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentTab { confirm = true } },
-        },
+          -- Key bindings
+          keys = {
+            { key = 't', mods = 'CMD', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
+            { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentTab { confirm = true } },
+          },
 
-        -- Default shell
-        default_prog = { '${pkgs.zsh}/bin/zsh', '-l' },
-      }
-    '';
+          -- Default shell
+          default_prog = { '${pkgs.zsh}/bin/zsh', '-l' },
+        }
+      '';
+    };
 
 
     # Alacritty - installed via Nix

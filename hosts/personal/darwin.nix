@@ -89,6 +89,7 @@
     "discord"
     "chatgpt"
     "emdash"
+    "cmux"
   ];
 
   # Environment variables
