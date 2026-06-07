@@ -1,0 +1,48 @@
+# Atuin Configuration
+# https://docs.atuin.sh/configuration/config/
+
+## Sync Settings
+# Disabled by default for privacy - enable with `atuin register` or `atuin login`
+sync_address = "https://api.atuin.sh"
+sync_frequency = "5m"
+auto_sync = false  # Set to true after registering/logging in
+
+## Search Settings
+search_mode = "fuzzy"           # prefix | fulltext | fuzzy | skim
+filter_mode = "global"          # global | host | session | directory
+filter_mode_shell_up_key_binding = "host"  # Up arrow searches current host only
+
+## UI Settings
+style = "compact"               # auto | full | compact
+inline_height = 20              # Number of lines for inline search
+show_preview = true             # Show command preview
+show_help = true                # Show keybinding help
+show_tabs = true                # Show filter mode tabs
+exit_mode = "return-original"   # return-original | return-query
+
+## History Settings
+update_check = true
+history_filter = [
+    "^ls$",
+    "^cd ",
+    "^pwd$",
+    "^exit$",
+    "^clear$",
+]
+# Don't record commands starting with space
+secrets_filter = true
+cwd_filter = []
+
+## Key bindings (vim-style available)
+# enter_accept = true
+# ctrl_n_shortcuts = true
+
+## Statistics
+[stats]
+enabled = true
+
+## Daemon mode (better performance)
+# Enable daemon = true for faster performance: `atuin daemon`
+[daemon]
+enabled = false
+sync_frequency = 300

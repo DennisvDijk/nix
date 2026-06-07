@@ -1,0 +1,150 @@
+# Starship Configuration — Compact with Icons
+# https://starship.rs/config/
+# Managed by chezmoi via nix → renders to ~/.config/starship.toml
+
+# Compact single-line format
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$python\
+$nodejs\
+$rust\
+$golang\
+$terraform\
+$docker_context\
+$kubernetes\
+$aws\
+$gcloud\
+$cmd_duration\
+$line_break\
+$character"""
+
+# Add a second line for the prompt character
+add_newline = true
+
+# Prompt character
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
+vimcmd_symbol = "[←](bold green)"
+
+# Username
+[username]
+style_user = "bold yellow"
+style_root = "bold red"
+format = "[$user]($style) "
+disabled = false
+show_always = false
+
+# Hostname
+[hostname]
+ssh_only = true
+format = "on [$hostname](bold blue) "
+disabled = false
+
+# Directory
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+format = "[$path]($style) "
+read_only = " 🔒"
+
+# Git branch
+[git_branch]
+symbol = " "
+style = "bold purple"
+format = "[$symbol$branch]($style) "
+
+# Git status
+[git_status]
+style = "bold red"
+format = "([$all_status$ahead_behind]($style) )"
+conflicted = "⚔️ "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕ "
+untracked = "?${count} "
+stashed = "📦 "
+modified = "!${count} "
+staged = "+${count} "
+renamed = "» "
+deleted = "✘${count} "
+
+# Python
+[python]
+symbol = " "
+style = "yellow"
+format = "[$symbol$pyenv_prefix$version]($style) "
+pyenv_version_name = false
+detect_extensions = ["py"]
+detect_files = ["requirements.txt", "pyproject.toml", "Pipfile"]
+
+# Node.js
+[nodejs]
+symbol = " "
+style = "bold green"
+format = "[$symbol$version]($style) "
+detect_files = ["package.json", ".node-version"]
+
+# Rust
+[rust]
+symbol = " "
+style = "bold red"
+format = "[$symbol$version]($style) "
+
+# Go
+[golang]
+symbol = " "
+style = "bold cyan"
+format = "[$symbol$version]($style) "
+
+# Terraform
+[terraform]
+symbol = "💠 "
+style = "bold purple"
+format = "[$symbol$workspace]($style) "
+detect_files = ["*.tf", "*.tfvars"]
+
+# Docker
+[docker_context]
+symbol = " "
+style = "bold blue"
+format = "[$symbol$context]($style) "
+only_with_files = true
+
+# Kubernetes
+[kubernetes]
+symbol = "☸ "
+style = "bold blue"
+format = "[$symbol$context( \\($namespace\\))]($style) "
+disabled = false
+
+# AWS
+[aws]
+symbol = " "
+style = "bold yellow"
+format = "[$symbol$profile( \\($region\\))]($style) "
+
+# Google Cloud
+[gcloud]
+symbol = "☁️ "
+style = "bold blue"
+format = "[$symbol$account( \\($project\\))]($style) "
+
+# Command duration
+[cmd_duration]
+min_time = 2000
+style = "bold yellow"
+format = "took [$duration]($style) "
+
+# Time (disabled by default, uncomment to enable)
+[time]
+disabled = true
+style = "bold white"
+format = "[$time]($style) "
+time_format = "%H:%M:%S"

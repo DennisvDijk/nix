@@ -25,10 +25,11 @@
     # Core (enabled by default via features/default.nix)
     shell = {
       enable = true;
-      starship.enable = true;
+      # chezmoi owns ~/.zshrc — disable HM file generation and zsh integrations
+      starship.enable = false;
       direnv.enable = true;
       zoxide.enable = true;
-      atuin.enable = true;
+      atuin.enable = false;
     };
     
     cli.enable = true;
@@ -91,6 +92,9 @@
     };
   };
 
+  # Let chezmoi manage ~/.zshrc (like work host)
+  programs.zsh.enable = lib.mkForce false;
+
   # User identity configuration
   # These are personal identifiers, not sensitive secrets
   my.user = {
@@ -114,27 +118,35 @@
 
   # Personal-specific packages (things not covered by features)
   home.packages = with pkgs; [
+    # Shell (chezmoi-managed config — see programs.zsh.enable override above)
+    zsh
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    starship
+    atuin
+
+    # Shell history layering (zshrc has conditional integrations for all three)
+    mcfly
+    hstr
+    pay-respects
+
     # Media tools (personal-specific)
     ffmpeg
     imagemagick
     mosh
   ];
 
-  # Zsh environment variables + rebuild helper for personal host
-  programs.zsh.initContent = lib.mkAfter ''
-    export PERSONAL_ENV=1
-    export NIX_HOST="${hostName}"
-
-    nix-rebuild() {
-      local host=''${NIX_HOST:-personal}
-      echo "🔨 Rebuilding darwin system for host: $host"
-
-      # Auto-check oMLX updates before rebuild (prompts with 15s timeout; defaults to no change)
-      if [ -x "${config.home.homeDirectory}/.config/nix/bin/update-omlx.sh" ]; then
-        "${config.home.homeDirectory}/.config/nix/bin/update-omlx.sh"
+  # Run chezmoi init/apply on every home-manager switch (chezmoi owns ~/.zshrc)
+  home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    dotfiles_source="${config.home.homeDirectory}/.config/nix/hosts/personal/dotfiles"
+    chezmoi_dir="${config.home.homeDirectory}/.local/share/chezmoi"
+    if [ -d "$dotfiles_source" ]; then
+      if [ ! -d "$chezmoi_dir" ]; then
+        echo "chezmoi: initialising from local nix repo source..."
+        ${pkgs.chezmoi}/bin/chezmoi init --source "$dotfiles_source" --apply --force
+      else
+        ${pkgs.chezmoi}/bin/chezmoi apply --source "$dotfiles_source" --force
       fi
-
-      sudo darwin-rebuild switch --flake ~/.config/nix#$host
-    }
+    fi
   '';
 }

@@ -6,7 +6,6 @@
 {
   imports = [
     ../../modules/darwin/features  # Import Darwin feature modules
-    ../../modules/shared/services/aerospace.nix
     ../../modules/shared/services/sketchybar.nix
     inputs.mac-app-util.darwinModules.default
   ];
