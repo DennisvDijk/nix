@@ -1,84 +1,19 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-wakatime", "opencode-notify"],
-  "enabled_providers": ["ai-gateway", "github-copilot"],
-  "provider": {
-    "ai-gateway": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "https://api.ai.enexis.nl/v1",
-      "options": {
-        "baseURL": "{env:ENEXIS_AI_GATEWAY_URL}",
-        "timeout": 300000
-      },
-      "models": {
-        "claude-sonnet-4.6-bedrock": {
-          "name": "claude-sonnet-4.6-bedrock"
-        },
-        "claude-opus-4.6-bedrock": {
-          "name": "claude-opus-4.6-bedrock"
-        },
-        "claude-opus-4.7-bedrock": {
-          "name": "claude-opus-4.7-bedrock"
-        },
-        "claude-haiku-4.5-bedrock": {
-          "name": "claude-haiku-4.5-bedrock"
-        },
-        "gpt-5.4": {
-          "name": "gpt-5.4"
-        },
-        "kimi-2.6": {
-          "name": "kimi-2.6"
-        }
-      }
-    }
-  },
-  "disabled_providers": [
-    "anthropic",
-    "openai",
-    "google",
-    "xai",
-    "amazon-bedrock",
-    "azure",
-    "openrouter"
+  "plugin": [
+    "opencode-wakatime",
+    "opencode-helicone-session",
+    "@nick-vi/opencode-type-inject",
+    "@tarquinen/opencode-dcp@latest",
+    "oh-my-openagent"
   ],
-  "model": "ai-gateway/claude-opus-4.7-bedrock",
+  "share": "manual",
+  "autoupdate": "notify",
+  "compaction": {
+    "auto": true,
+    "prune": true
+  },
   "permission": {
-    "skill": {
-      "*": "allow",
-      "experimental-*": "ask",
-      "internal-*": "deny"
-    },
-    "bash": {
-      "*": "ask",
-      "git status": "allow",
-      "git status *": "allow",
-      "git diff": "allow",
-      "git diff *": "allow",
-      "git log": "allow",
-      "git log *": "allow",
-      "git branch": "allow",
-      "git branch *": "allow",
-      "git show *": "allow",
-      "python *": "allow",
-      "pip *": "ask",
-      "pipenv *": "ask",
-      "poetry *": "ask",
-      "pytest": "allow",
-      "pytest *": "allow",
-      "ruff *": "allow",
-      "mypy *": "allow",
-      "cargo *": "allow",
-      "go *": "allow",
-      "terraform *": "allow",
-      "terraform fmt": "allow",
-      "terraform validate": "allow",
-      "tofu *": "allow",
-      "yamllint *": "allow",
-      "rm *": "ask",
-      "rm -rf *": "deny"
-    },
-    "edit": "ask",
-    "write": "ask",
     "read": {
       "*": "allow",
       "*.env": "ask",
@@ -90,6 +25,12 @@
       "*secret*": "ask",
       "~/.config/opencode/get-shit-done/*": "allow"
     },
+    "edit": "ask",
+    "write": "ask",
+    "bash": "ask",
+    "task": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
     "external_directory": {
       "~/.config/opencode/get-shit-done/*": "allow"
     }
@@ -104,272 +45,6 @@
     "task": true,
     "skill": true
   },
-  "agent": {
-    "explore": {
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock"
-    },
-    "general": {
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock"
-    },
-    "title": {
-      "model": "ai-gateway/claude-haiku-4.5-bedrock"
-    },
-    "summary": {
-      "model": "ai-gateway/claude-haiku-4.5-bedrock"
-    },
-    "compaction": {
-      "model": "ai-gateway/claude-sonnet-4.6-bedrock"
-    },
-    "code-reviewer": {
-      "description": "Comprehensive code reviewer for security, performance, and maintainability across Python, Go, Rust, Terraform, and YAML",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.1,
-      "prompt": "{file:~/.config/opencode/prompts/code-reviewer.md}",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": false
-      },
-      "permission": {
-        "skill": {
-          "python-best-practices": "allow",
-          "go-standards": "allow",
-          "rust-standards": "allow",
-          "terraform-guidelines": "allow",
-          "yaml-standards": "allow"
-        }
-      }
-    },
-    "security-auditor": {
-      "description": "Security-focused code auditor identifying vulnerabilities, misconfigurations, and compliance issues",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-opus-4.7-bedrock",
-      "temperature": 0.1,
-      "prompt": "{file:~/.config/opencode/prompts/security-auditor.md}",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": false
-      },
-      "permission": {
-        "skill": {
-          "python-best-practices": "allow",
-          "go-standards": "allow",
-          "rust-standards": "allow",
-          "terraform-guidelines": "allow"
-        }
-      }
-    },
-    "python-expert": {
-      "description": "Python specialist for advanced refactoring, performance optimization, and modern Python patterns",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.2,
-      "prompt": "{file:~/.config/opencode/prompts/python-expert.md}",
-      "permission": {
-        "skill": {
-          "python-best-practices": "allow"
-        }
-      }
-    },
-    "go-expert": {
-      "description": "Go specialist for idiomatic code, concurrency patterns, and module management",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.2,
-      "prompt": "{file:~/.config/opencode/prompts/go-expert.md}",
-      "permission": {
-        "skill": {
-          "go-standards": "allow"
-        }
-      }
-    },
-    "rust-expert": {
-      "description": "Rust specialist for ownership patterns, async code, and performance optimization",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.2,
-      "prompt": "{file:~/.config/opencode/prompts/rust-expert.md}",
-      "permission": {
-        "skill": {
-          "rust-standards": "allow"
-        }
-      }
-    },
-    "terraform-expert": {
-      "description": "Terraform specialist for infrastructure code, module design, and state management",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.2,
-      "prompt": "{file:~/.config/opencode/prompts/terraform-expert.md}",
-      "permission": {
-        "skill": {
-          "terraform-guidelines": "allow",
-          "yaml-standards": "allow"
-        }
-      }
-    },
-    "yaml-expert": {
-      "description": "YAML specialist for Kubernetes, GitHub Actions, and configuration validation",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.1,
-      "prompt": "{file:~/.config/opencode/prompts/yaml-expert.md}",
-      "tools": {
-        "bash": true
-      },
-      "permission": {
-        "skill": {
-          "yaml-standards": "allow"
-        }
-      }
-    },
-    "test-writer": {
-      "description": "Generates comprehensive unit and integration tests with high coverage",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.3,
-      "prompt": "{file:~/.config/opencode/prompts/test-writer.md}",
-      "permission": {
-        "skill": {
-          "python-best-practices": "allow",
-          "go-standards": "allow",
-          "rust-standards": "allow"
-        }
-      }
-    },
-    "debug-agent": {
-      "description": "Debugging specialist for root cause analysis and issue investigation",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.2,
-      "prompt": "{file:~/.config/opencode/prompts/debug-agent.md}",
-      "permission": {
-        "skill": {
-          "python-best-practices": "allow",
-          "go-standards": "allow",
-          "rust-standards": "allow",
-          "terraform-guidelines": "allow"
-        }
-      }
-    },
-    "refactor-agent": {
-      "description": "Refactoring specialist for improving code quality while preserving functionality",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.2,
-      "prompt": "{file:~/.config/opencode/prompts/refactor-agent.md}",
-      "permission": {
-        "skill": {
-          "python-best-practices": "allow",
-          "go-standards": "allow",
-          "rust-standards": "allow"
-        }
-      }
-    },
-    "documentation-writer": {
-      "description": "Creates and maintains project documentation, READMEs, and API docs",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.3,
-      "prompt": "{file:~/.config/opencode/prompts/documentation-writer.md}",
-      "tools": {
-        "bash": false
-      }
-    },
-    "performance-optimizer": {
-      "description": "Performance optimization specialist for identifying bottlenecks and suggesting improvements",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-opus-4.7-bedrock",
-      "temperature": 0.1,
-      "prompt": "{file:~/.config/opencode/prompts/performance-optimizer.md}",
-      "tools": {
-        "write": false,
-        "edit": false
-      },
-      "permission": {
-        "skill": {
-          "python-best-practices": "allow",
-          "go-standards": "allow",
-          "rust-standards": "allow"
-        }
-      }
-    },
-    "api-designer": {
-      "description": "API design specialist for REST, gRPC, and GraphQL APIs with OpenAPI specs",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.3,
-      "prompt": "{file:~/.config/opencode/prompts/api-designer.md}",
-      "permission": {
-        "skill": {
-          "python-best-practices": "allow",
-          "go-standards": "allow",
-          "rust-standards": "allow",
-          "yaml-standards": "allow"
-        }
-      }
-    },
-    "security-reviewer": {
-      "description": "Security-focused code auditor with OWASP, compliance (SOC2/GDPR/HIPAA), and vulnerability expertise",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-opus-4.7-bedrock",
-      "temperature": 0.1,
-      "prompt": "{file:~/.config/opencode/prompts/security-reviewer.md}",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": false
-      },
-      "permission": {
-        "skill": {
-          "security-guidelines": "allow",
-          "compliance-standards": "allow",
-          "docker-security": "allow",
-          "python-best-practices": "allow",
-          "go-standards": "allow",
-          "terraform-guidelines": "allow"
-        }
-      }
-    },
-    "sre-agent": {
-      "description": "Site Reliability Engineer for observability, incident response, and infrastructure reliability",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.2,
-      "prompt": "{file:~/.config/opencode/prompts/sre-agent.md}",
-      "permission": {
-        "skill": {
-          "observability-patterns": "allow",
-          "incident-management": "allow",
-          "kubernetes-guidelines": "allow",
-          "aws-best-practices": "allow",
-          "azure-best-practices": "allow",
-          "terraform-guidelines": "allow"
-        }
-      }
-    },
-    "devops-engineer": {
-      "description": "DevOps specialist for CI/CD pipelines, infrastructure automation, and deployment strategies",
-      "mode": "subagent",
-      "model": "ai-gateway/claude-haiku-4.5-bedrock",
-      "temperature": 0.2,
-      "prompt": "{file:~/.config/opencode/prompts/devops-engineer.md}",
-      "permission": {
-        "skill": {
-          "cicd-best-practices": "allow",
-          "docker-security": "allow",
-          "kubernetes-guidelines": "allow",
-          "terraform-guidelines": "allow",
-          "yaml-standards": "allow"
-        }
-      }
-    }
-  },
-  "default_agent": "build",
   "command": {
     "test": {
       "template": "Run the full test suite with coverage report and show any failures. Focus on the failing tests and suggest fixes.",
@@ -409,26 +84,6 @@
     "optimize": {
       "template": "@performance-optimizer Analyze the code for performance bottlenecks and suggest optimizations.",
       "description": "Performance analysis",
-      "agent": "build"
-    },
-    "security-review": {
-      "template": "@security-reviewer Perform a comprehensive security review. Check for OWASP vulnerabilities, secrets exposure, injection attacks, and compliance issues.",
-      "description": "Security code review",
-      "agent": "build"
-    },
-    "sre": {
-      "template": "@sre-agent Analyze observability, monitoring, and reliability aspects. Check logging, metrics, alerting, and incident handling patterns.",
-      "description": "SRE analysis",
-      "agent": "build"
-    },
-    "devops": {
-      "template": "@devops-engineer Review CI/CD pipelines, deployment configurations, and infrastructure automation.",
-      "description": "DevOps review",
-      "agent": "build"
-    },
-    "compliance": {
-      "template": "@security-reviewer Perform a compliance audit. Check for SOC2, GDPR, HIPAA requirements and data handling practices.",
-      "description": "Compliance audit",
       "agent": "build"
     }
   },
@@ -486,11 +141,6 @@
       ".DS_Store"
     ]
   },
-  "compaction": {
-    "auto": true,
-    "prune": true
-  },
-  "share": "manual",
   "mcp": {
     "searxng": {
       "type": "local",
@@ -507,29 +157,6 @@
       "environment": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_TOKEN}"
       }
-    },
-    "postgres": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-postgres"],
-      "enabled": false,
-      "environment": {
-        "POSTGRES_CONNECTION_STRING": "{env:DATABASE_URL}"
-      }
-    },
-    "memory": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
-      "enabled": false
-    },
-    "filesystem": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "{env:HOME}"
-      ],
-      "enabled": false
     },
     "mempalace": {
       "type": "local",
