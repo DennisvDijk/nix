@@ -205,6 +205,7 @@
     # Media / general utility
     ffmpeg
     imagemagick
+    moonlight-qt
     mosh
 
     # AWS SSM — installed via Homebrew (see hosts/work/darwin.nix)
