@@ -90,7 +90,6 @@
     "parsec"
 
     # Gaming/Fun
-    "moonlight"
     "steam"
     "blender"
     "discord"

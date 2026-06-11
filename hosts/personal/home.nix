@@ -133,6 +133,7 @@
     # Media tools (personal-specific)
     ffmpeg
     imagemagick
+    moonlight-qt
     mosh
   ];
 
