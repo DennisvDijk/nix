@@ -72,11 +72,17 @@
     # Development
     "wave"
 
+    # Productivity
+    "obsidian"
+
     # AI/ML
     "ollama-app"
     "lm-studio"
     "llamabarn"
     "claude"
+
+    # Window manager
+    "nikitabobko/tap/aerospace"
 
     # Utilities
     "jordanbaird-ice"
@@ -84,6 +90,7 @@
     "parsec"
 
     # Gaming/Fun
+    "moonlight"
     "steam"
     "blender"
     "discord"
