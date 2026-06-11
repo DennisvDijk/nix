@@ -127,6 +127,21 @@
   homebrew.brews = lib.mkAfter [
     # AWS SSM Session Manager plugin — not available in nixpkgs
     "session-manager-plugin"
+
+    # Skyhook Radar — network observability / API monitoring
+    # Tap: skyhook-io/tap (https://github.com/skyhook-io/homebrew-tap)
+    # Version: latest from tap (comment below tracks last pinned version)
+    # Last reviewed: 2026-06-09
+    # To check for updates: bin/update-radar.sh
+    "skyhook-io/tap/radar"
+  ];
+
+  # Tap for Skyhook Radar — must be declared explicitly so nix-darwin tracks it
+  homebrew.taps = lib.mkAfter [
+    {
+      name = "skyhook-io/tap";
+      clone_target = "https://github.com/skyhook-io/homebrew-tap";
+    }
   ];
 
   # Environment variables
@@ -141,4 +156,37 @@
     home-manager
     git
   ];
+
+  # Auto-check Radar updates on every darwin-rebuild switch
+  # Runs in --check (non-interactive) mode; prompts you to run update-radar.sh manually if an update is found
+  system.activationScripts.checkRadarUpdate = {
+    text = ''
+      if command -v brew &>/dev/null && brew list radar &>/dev/null 2>&1; then
+        echo "Checking Skyhook Radar for updates..."
+        "$HOME/.config/nix/bin/update-radar.sh" --check \
+          && echo "  Radar is up to date." \
+          || echo "  Run ~/.config/nix/bin/update-radar.sh to review and apply the update."
+      fi
+    '';
+  };
+
+  # Daily background check — pops a macOS notification if an update is available
+  launchd.user.agents.radarUpdateCheck = {
+    serviceConfig = {
+      Label = "io.skyhook.radar-update-check";
+      ProgramArguments = [
+        "/bin/bash"
+        "-c"
+        ''
+          if /opt/homebrew/bin/brew list radar &>/dev/null 2>&1; then
+            /Users/${config.system.primaryUser}/.config/nix/bin/update-radar.sh --check \
+              || /usr/bin/osascript -e 'display notification "Run ~/.config/nix/bin/update-radar.sh to upgrade." with title "Skyhook Radar update available"'
+          fi
+        ''
+      ];
+      StartCalendarInterval = [{ Hour = 9; Minute = 0; }];  # Daily at 09:00
+      StandardOutPath = "/tmp/radar-update-check.log";
+      StandardErrorPath = "/tmp/radar-update-check.log";
+    };
+  };
 }
