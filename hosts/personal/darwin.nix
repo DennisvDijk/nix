@@ -85,7 +85,7 @@
     "nikitabobko/tap/aerospace"
 
     # Utilities
-    "jordanbaird-ice"
+    "thaw"
     "tailscale-app"
     "parsec"
 

@@ -39,7 +39,6 @@
       "google-chrome"
       "spotify"
       "rectangle"
-      "jordanbaird-ice"
       "stats"
       "whatsapp"
       "iterm2"
