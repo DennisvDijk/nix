@@ -26,6 +26,7 @@
       "supabase/tap/supabase"
       "yt-dlp"
       "anomalyco/tap/opencode"
+      "pi-coding-agent"
     ];
     
     # Homebrew taps for special formulae
