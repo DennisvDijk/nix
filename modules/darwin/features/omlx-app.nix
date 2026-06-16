@@ -3,11 +3,11 @@
 let
   omlx-app = pkgs.stdenv.mkDerivation rec {
     pname = "omlx-app";
-    version = "0.4.2rc1";
+    version = "0.4.4";
 
     src = pkgs.fetchurl {
-      url = "https://github.com/jundot/omlx/releases/download/v0.4.2rc1";
-      sha256 = "1xb3ziyz2608nqv5pfvywkpxlsjps1x1pdz03mivykdcwc8185ya";
+      url = "https://github.com/jundot/omlx/releases/download/v0.4.4";
+      sha256 = "1v9zkkvw02w8b6pfv0dfv9nj97cizr39p9q5xq75v9gk6br82fxh";
     };
 
     # hdiutil requires macOS system services; disable sandbox for this derivation
