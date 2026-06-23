@@ -62,8 +62,8 @@ in
     ];
 
     # AI tool configurations
-    # Note: OpenCode configuration is now managed by modules/shared/programs/opencode.nix
-    # which handles opencode.json, skills, agents, rules, and commands comprehensively
+    # Note: OpenCode configuration is managed by chezmoi dotfiles
+    # (hosts/{personal,work}/dotfiles/home/dot_config/opencode/)
 
     # Shell aliases for AI tools
     programs.zsh.shellAliases = {

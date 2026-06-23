@@ -1,171 +1,222 @@
 {
   "$schema": "https://opencode.ai/config.json",
+
   "plugin": [
-    "opencode-wakatime",
-    "opencode-helicone-session",
-    "@nick-vi/opencode-type-inject",
-    "@tarquinen/opencode-dcp@latest",
-    "oh-my-openagent"
+    "opencode-wakatime"
   ],
+
   "share": "manual",
   "autoupdate": "notify",
+
   "compaction": {
     "auto": true,
     "prune": true
   },
-  "permission": {
-    "read": {
-      "*": "allow",
-      "*.env": "ask",
-      "*.env.*": "ask",
-      ".env": "ask",
-      "*.pem": "deny",
-      "*.key": "deny",
-      "*credentials*": "ask",
-      "*secret*": "ask",
-      "~/.config/opencode/get-shit-done/*": "allow"
+
+  "provider": {
+    "ai-gateway": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Enexis AI Gateway",
+      "options": {
+        "baseURL": "{env:ENEXIS_AI_GATEWAY_URL}",
+        "apiKey": "{env:ENEXIS_AI_GATEWAY_KEY}",
+        "timeout": 300000
+      },
+      "models": {
+        "claude-sonnet-4-5": { "name": "claude-sonnet-4-5" },
+        "claude-haiku-4-5":  { "name": "claude-haiku-4-5"  },
+        "claude-opus-4-5":   { "name": "claude-opus-4-5"   },
+        "deepseek-r1-0528":  { "name": "deepseek-r1-0528"  }
+      }
     },
-    "edit": "ask",
-    "write": "ask",
-    "bash": "ask",
-    "task": "allow",
-    "webfetch": "allow",
+    "opencode-go": {},
+    "copilot": {}
+  },
+
+  "enabled_providers":  ["ai-gateway", "opencode-go", "copilot"],
+  "disabled_providers": ["anthropic", "openai", "google", "xai", "amazon-bedrock", "azure", "openrouter"],
+
+  "model": "ai-gateway/claude-sonnet-4-5",
+  "small_model": "opencode-go/deepseek-v4-flash",
+
+  "tools": {
+    "bash":      true,
+    "edit":      true,
+    "write":     true,
+    "read":      true,
+    "grep":      true,
+    "glob":      true,
+    "task":      true,
+    "skill":     true,
+    "webfetch":  true,
+    "websearch": true
+  },
+
+  "permission": {
+    "skill":     { "*": "allow" },
+    "task":      "allow",
+    "webfetch":  "allow",
     "websearch": "allow",
     "external_directory": {
-      "~/.config/opencode/get-shit-done/*": "allow"
-    }
+      "~/.config/opencode/*": "allow"
+    },
+    "bash": {
+      "*":                           "ask",
+      "git status":                  "allow",
+      "git status *":                "allow",
+      "git diff":                    "allow",
+      "git diff *":                  "allow",
+      "git log *":                   "allow",
+      "git show *":                  "allow",
+      "git add *":                   "allow",
+      "git commit *":                "allow",
+      "git fetch *":                 "allow",
+      "git stash list":              "allow",
+      "python *":                    "allow",
+      "uv *":                        "allow",
+      "pytest *":                    "allow",
+      "ruff *":                      "allow",
+      "mypy *":                      "allow",
+      "node *":                      "allow",
+      "npm test":                    "allow",
+      "npm run *":                   "allow",
+      "terraform fmt":               "allow",
+      "terraform validate":          "allow",
+      "terraform plan *":            "allow",
+      "tofu plan *":                 "allow",
+      "helm lint *":                 "allow",
+      "helm template *":             "allow",
+      "helm diff *":                 "allow",
+      "kubectl get *":               "allow",
+      "kubectl describe *":          "allow",
+      "kubectl logs *":              "allow",
+      "kubectl diff *":              "allow",
+      "aws sts get-caller-identity": "allow",
+      "aws s3 ls *":                 "allow",
+      "kubectl apply *":             "ask",
+      "helm upgrade *":              "ask",
+      "helm install *":              "ask",
+      "terraform apply *":           "ask",
+      "pip install *":               "ask",
+      "npm install *":               "ask",
+      "sudo *":                      "deny",
+      "rm -rf *":                    "deny",
+      "kubectl delete *":            "deny",
+      "terraform destroy *":         "deny",
+      "helm uninstall *":            "deny",
+      "aws iam delete-*":            "deny"
+    },
+    "read": {
+      "*":               "allow",
+      "*.env":           "ask",
+      "*.env.*":         "ask",
+      ".env":            "ask",
+      "**/.env":         "ask",
+      "*.pem":           "deny",
+      "*.key":           "deny",
+      "**/secrets*":     "deny",
+      "**/*credential*": "deny"
+    },
+    "write": "ask",
+    "edit":  "ask"
   },
-  "tools": {
-    "bash": true,
-    "edit": true,
-    "write": true,
-    "read": true,
-    "grep": true,
-    "glob": true,
-    "task": true,
-    "skill": true
-  },
+
   "command": {
     "test": {
-      "template": "Run the full test suite with coverage report and show any failures. Focus on the failing tests and suggest fixes.",
-      "description": "Run tests with coverage",
-      "agent": "build"
+      "template": "Run full test suite with coverage. Show failures, suggest fixes.",
+      "description": "Run tests"
     },
     "lint": {
-      "template": "Run linters (ruff, mypy, cargo clippy, go vet, terraform fmt) and fix any issues found. Focus on the target language.",
-      "description": "Lint and format code",
-      "agent": "build"
-    },
-    "typecheck": {
-      "template": "Run type checkers (mypy for Python, cargo check for Rust, go build for Go) and report errors. Suggest fixes.",
-      "description": "Type check code",
-      "agent": "build"
+      "template": "Run ruff, mypy, terraform fmt. Fix issues found.",
+      "description": "Lint and format"
     },
     "review": {
-      "template": "@code-reviewer Review the current file or codebase for best practices, security issues, and performance bottlenecks.",
-      "description": "Code review",
-      "agent": "build"
+      "template": "@reviewer Review current diff or file for security, NIS2 compliance, and quality. Use full checklist.",
+      "description": "Code review"
     },
     "security": {
-      "template": "@security-auditor Perform a security audit on the codebase. Look for vulnerabilities, misconfigurations, and compliance issues.",
-      "description": "Security audit",
-      "agent": "build"
+      "template": "@reviewer Security audit: secrets, EU data residency, unpinned deps, missing auth, LiteLLM bypass.",
+      "description": "Security audit"
     },
     "docs": {
-      "template": "@documentation-writer Update or create documentation for the current module/file.",
-      "description": "Generate documentation",
-      "agent": "build"
-    },
-    "refactor": {
-      "template": "@refactor-agent Refactor the current code to improve quality and maintainability while preserving functionality.",
-      "description": "Refactor code",
-      "agent": "build"
-    },
-    "optimize": {
-      "template": "@performance-optimizer Analyze the code for performance bottlenecks and suggest optimizations.",
-      "description": "Performance analysis",
-      "agent": "build"
+      "template": "Write or update docstrings and README for the current module. Be concise.",
+      "description": "Generate docs"
     }
   },
+
   "formatter": {
     "ruff": {
-      "disabled": false,
       "command": ["ruff", "check", "--fix", "$FILE"],
       "extensions": [".py"]
     },
-    "black": {
-      "disabled": false,
-      "command": ["black", "$FILE"],
+    "ruff-format": {
+      "command": ["ruff", "format", "$FILE"],
       "extensions": [".py"]
     },
-    "goimports": {
-      "disabled": false,
-      "command": ["goimports", "-w", "$FILE"],
-      "extensions": [".go"]
-    },
-    "rustfmt": {
-      "disabled": false,
-      "command": ["rustfmt", "$FILE"],
-      "extensions": [".rs"]
-    },
     "terraform": {
-      "disabled": false,
       "command": ["terraform", "fmt", "$FILE"],
       "extensions": [".tf", ".tfvars"]
     },
     "prettier-yaml": {
-      "disabled": false,
       "command": ["prettier", "--write", "$FILE"],
       "extensions": [".yaml", ".yml"]
     }
   },
+
   "watcher": {
     "ignore": [
-      "__pycache__/**",
-      "*.pyc",
-      ".pytest_cache/**",
-      ".mypy_cache/**",
-      ".venv/**",
-      "venv/**",
-      ".git/**",
-      "*.egg-info/**",
-      "dist/**",
-      "build/**",
-      ".coverage",
-      "htmlcov/**",
-      "target/**",
-      "Cargo.lock",
-      "node_modules/**",
-      ".terraform/**",
-      "*.tfstate*",
+      "__pycache__/**", "*.pyc",
+      ".pytest_cache/**", ".mypy_cache/**",
+      ".venv/**", "venv/**",
+      ".git/**", "*.egg-info/**",
+      "dist/**", "build/**",
+      ".coverage", "htmlcov/**",
+      "target/**", "node_modules/**",
+      ".terraform/**", "*.tfstate*",
       ".DS_Store"
     ]
   },
-  "mcp": {
-    "searxng": {
-      "type": "local",
-      "command": ["npx", "-y", "mcp-searxng"],
-      "enabled": true,
-      "environment": {
-        "SEARXNG_URL": "http://localhost:8080"
-      }
+
+  "lsp": {
+    "python": {
+      "command": ["pylsp"],
+      "extensions": [".py"]
     },
-    "github": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
-      "enabled": false,
-      "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_TOKEN}"
-      }
-    },
-    "mempalace": {
-      "type": "local",
-      "command": [
-        "{{ .chezmoi.homeDir }}/.local/share/uv/tools/mempalace/bin/python",
-        "-m",
-        "mempalace.mcp_server"
-      ],
-      "enabled": true
+    "terraform": {
+      "command": ["terraform-ls", "serve"],
+      "extensions": [".tf", ".tfvars"]
     }
-  }
+  },
+
+  "mcp": {
+    "mem0": {
+      "type":    "local",
+      "command": ["python", "-m", "mem0_mcp.server"],
+      "environment": { "MEM0_API_URL": "{env:MEM0_API_URL}" }
+    },
+    "headroom": {
+      "type":    "local",
+      "command": ["headroom", "mcp", "serve"],
+      "environment": {
+        "HEADROOM_OUTPUT_SHAPER": "1",
+        "HEADROOM_CACHE_ALIGN":   "1",
+        "HEADROOM_LOG_LEVEL":     "warn"
+      }
+    },
+    "gitlab": {
+      "type":    "local",
+      "command": ["npx", "@modelcontextprotocol/server-gitlab"],
+      "environment": {
+        "GITLAB_TOKEN": "{env:GITLAB_TOKEN}",
+        "GITLAB_URL":   "{env:GITLAB_URL}"
+      }
+    },
+    "searxng": {
+      "type":    "local",
+      "command": ["npx", "-y", "mcp-searxng"],
+      "enabled": false,
+      "environment": { "SEARXNG_URL": "http://localhost:8080" }
+    }
+  },
+
 }

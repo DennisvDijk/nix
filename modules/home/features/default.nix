@@ -16,7 +16,6 @@
     ./nh.nix
     ./devtools.nix
     ../../shared/ui/fonts.nix
-    ../../shared/programs/opencode.nix
   ];
   
   # Global feature options
