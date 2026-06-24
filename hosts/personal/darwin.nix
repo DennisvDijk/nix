@@ -77,10 +77,12 @@
     "obsidian"
 
     # AI/ML
+    "handy"
     "ollama-app"
     "lm-studio"
     "llamabarn"
     "claude"
+    "typewhisper/tap/typewhisper"
 
     # Window manager
     "nikitabobko/tap/aerospace"
@@ -97,6 +99,13 @@
     "chatgpt"
     "emdash"
     "cmux"
+  ];
+
+  homebrew.taps = lib.mkAfter [
+    {
+      name = "typewhisper/tap";
+      clone_target = "https://github.com/typewhisper/homebrew-tap";
+    }
   ];
 
   # Environment variables

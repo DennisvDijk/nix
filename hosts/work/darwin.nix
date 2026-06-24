@@ -95,6 +95,7 @@
     "lm-studio"
     "opencode-desktop"
     "handy"
+    "typewhisper/tap/typewhisper"
 
     # ── Productivity / Notes ───────────────────────────────────────
     "drawio"
@@ -138,6 +139,10 @@
 
   # Tap for Skyhook Radar — must be declared explicitly so nix-darwin tracks it
   homebrew.taps = lib.mkAfter [
+    {
+      name = "typewhisper/tap";
+      clone_target = "https://github.com/typewhisper/homebrew-tap";
+    }
     {
       name = "skyhook-io/tap";
       clone_target = "https://github.com/skyhook-io/homebrew-tap";
