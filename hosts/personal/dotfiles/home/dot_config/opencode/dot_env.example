@@ -1,0 +1,8 @@
+# Headroom proxy environment
+# Copy to .env and fill in. The launchd service sources this on startup.
+# This file is gitignored — never commit real values.
+
+# Enexis AI Gateway (the real upstream headroom proxy forwards to)
+# Full OpenAI-compatible base URL — the SDK appends /chat/completions
+ENEXIS_AI_GATEWAY_URL=https://api.ai.enexis.nl/v1
+ENEXIS_AI_GATEWAY_KEY=

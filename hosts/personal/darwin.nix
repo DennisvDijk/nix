@@ -7,6 +7,7 @@
   imports = [
     ../../modules/darwin/features  # Import Darwin feature modules
     ../../modules/shared/services/sketchybar.nix
+    ../../modules/shared/services/headroom.nix
     inputs.mac-app-util.darwinModules.default
   ];
 
@@ -108,4 +109,15 @@
     home-manager
     git
   ];
+
+  # Headroom context compression proxy
+  # Requires: uv tool install "headroom-ai[all]"  (binary at ~/.local/bin/headroom)
+  # Proxy runs on port 8787, compresses all LLM traffic, provides persistent memory
+  my.services.headroom = {
+    enable = true;
+    port = 8787;
+    memory = true;
+    learn = true;
+    codeGraph = true;
+  };
 }

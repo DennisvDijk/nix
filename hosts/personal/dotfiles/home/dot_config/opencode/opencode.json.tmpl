@@ -18,7 +18,7 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Enexis AI Gateway",
       "options": {
-        "baseURL": "{env:ENEXIS_AI_GATEWAY_URL}",
+        "baseURL": "http://127.0.0.1:8787/v1",
         "apiKey": "{env:ENEXIS_AI_GATEWAY_KEY}",
         "timeout": 300000
       },
@@ -189,11 +189,6 @@
   },
 
   "mcp": {
-    "mem0": {
-      "type":    "local",
-      "command": ["python", "-m", "mem0_mcp.server"],
-      "environment": { "MEM0_API_URL": "{env:MEM0_API_URL}" }
-    },
     "headroom": {
       "type":    "local",
       "command": ["headroom", "mcp", "serve"],
@@ -203,19 +198,9 @@
         "HEADROOM_LOG_LEVEL":     "warn"
       }
     },
-    "gitlab": {
+    "ripgrep": {
       "type":    "local",
-      "command": ["npx", "@modelcontextprotocol/server-gitlab"],
-      "environment": {
-        "GITLAB_TOKEN": "{env:GITLAB_TOKEN}",
-        "GITLAB_URL":   "{env:GITLAB_URL}"
-      }
-    },
-    "searxng": {
-      "type":    "local",
-      "command": ["npx", "-y", "mcp-searxng"],
-      "enabled": false,
-      "environment": { "SEARXNG_URL": "http://localhost:8080" }
+      "command": ["npx", "-y", "mcp-ripgrep"]
     }
   },
 
