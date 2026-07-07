@@ -173,16 +173,11 @@
   # (or rebuild — this activation will re-apply on every home-manager switch).
   home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     dotfiles_source="${config.home.homeDirectory}/.config/nix/hosts/work/dotfiles"
-    chezmoi_dir="${config.home.homeDirectory}/.local/share/chezmoi"
     if [ -d "$dotfiles_source" ]; then
-      if [ ! -d "$chezmoi_dir" ]; then
-        echo "chezmoi: initialising from local nix repo source..."
-        ${pkgs.chezmoi}/bin/chezmoi init --source "$dotfiles_source" --apply --force
-      else
-        # Already initialised — apply any changes from the nix repo (force overwrites
-        # local drift; the nix repo is the single source of truth for these files).
-        ${pkgs.chezmoi}/bin/chezmoi apply --source "$dotfiles_source" --force
-      fi
+      # Always apply — nix repo is the single source of truth for these dotfiles.
+      # chezmoi apply --source does not create ~/.local/share/chezmoi, so the old
+      # dir-exists guard was always hitting the init branch anyway.
+      ${pkgs.chezmoi}/bin/chezmoi apply --source "$dotfiles_source" --force
     else
       echo "chezmoi: dotfiles_source $dotfiles_source not found — skipping (symlink ~/.config/nix to your repo checkout)"
     fi
