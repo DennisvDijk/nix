@@ -18,26 +18,41 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Enexis AI Gateway",
       "options": {
-        "baseURL": "http://127.0.0.1:8787/v1",
+        "baseURL": "{env:ENEXIS_AI_GATEWAY_URL}",
         "apiKey": "{env:ENEXIS_AI_GATEWAY_KEY}",
         "timeout": 300000
       },
       "models": {
-        "claude-sonnet-4-5": { "name": "claude-sonnet-4-5" },
-        "claude-haiku-4-5":  { "name": "claude-haiku-4-5"  },
-        "claude-opus-4-5":   { "name": "claude-opus-4-5"   },
-        "deepseek-r1-0528":  { "name": "deepseek-r1-0528"  }
+        "claude-sonnet-4.6-bedrock": { "name": "claude-sonnet-4.6" },
+        "claude-haiku-4.5-bedrock":  { "name": "claude-haiku-4.5"  },
+        "claude-opus-4.8"-bedrock:   { "name": "claude-opus-4.8"   },
+        "gpt-5.4" : {"name": "gpt-5.4"},
+        "gpt-5.4-mini": {"name": "gpt-5.4-mini"}
       }
     },
     "opencode-go": {},
-    "copilot": {}
+    "copilot": {},
+    "omlx": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "oMLX local",
+      "options": {
+        "baseURL": "http://127.0.0.1:8000/v1",
+        "timeout": 300000
+      },
+      "models" : {
+        "qwen3.6-35B-A3B-4bit" : { 
+          "name": "Qwen3.6-35B-A3B",
+          "limit": { "context": 65536, "output": 4096 }
+        },
+        "qwen3.6-27b-4bit": {"name": "qwen3.6-27b-4bit"}
+      }
   },
 
-  "enabled_providers":  ["ai-gateway", "opencode-go", "copilot"],
+  "enabled_providers":  ["ai-gateway", "opencode-go", "copilot", "omlx"],
   "disabled_providers": ["anthropic", "openai", "google", "xai", "amazon-bedrock", "azure", "openrouter"],
 
-  "model": "ai-gateway/claude-sonnet-4-5",
-  "small_model": "opencode-go/deepseek-v4-flash",
+  "model": "ai-gateway/claude-sonnet-4.6-bedrock",
+  "small_model": "ai-gateway/gpt-5.4-mini",
 
   "tools": {
     "bash":      true,
@@ -189,6 +204,11 @@
   },
 
   "mcp": {
+    "mem0": {
+      "type":    "local",
+      "command": ["python", "-m", "mem0_mcp.server"],
+      "environment": { "MEM0_API_URL": "{env:MEM0_API_URL}" }
+    },
     "headroom": {
       "type":    "local",
       "command": ["headroom", "mcp", "serve"],
@@ -198,9 +218,19 @@
         "HEADROOM_LOG_LEVEL":     "warn"
       }
     },
-    "ripgrep": {
+    "gitlab": {
       "type":    "local",
-      "command": ["npx", "-y", "mcp-ripgrep"]
+      "command": ["npx", "@modelcontextprotocol/server-gitlab"],
+      "environment": {
+        "GITLAB_TOKEN": "{env:GITLAB_TOKEN}",
+        "GITLAB_URL":   "{env:GITLAB_URL}"
+      }
+    },
+    "searxng": {
+      "type":    "local",
+      "command": ["npx", "-y", "mcp-searxng"],
+      "enabled": false,
+      "environment": { "SEARXNG_URL": "http://localhost:8080" }
     }
   },
 
