@@ -34,6 +34,10 @@
     "npm:pi-rtk-optimizer",
     "npm:pi-dynamic-workflows",
     "npm:pi-subagents",
+    "npm:pi-lens",
+    "npm:@vigolium/piolium",
+    "npm:@mjasnikovs/pi-task",
+    "npm:pi-hermes-memory",
     "npm:remote-pi"
   ],
   "enableSkillCommands": true,
