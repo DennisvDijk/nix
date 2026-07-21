@@ -32,6 +32,8 @@
     "npm:@gotgenes/pi-permission-system",
     "npm:pi-opencode-go-provider",
     "npm:pi-rtk-optimizer",
+    "npm:pi-dynamic-workflows",
+    "npm:pi-subagents",
     "npm:pi-mcp-adapter"
   ],
   "enableSkillCommands": true,
