@@ -31,7 +31,8 @@
     "npm:pi-web-access",
     "npm:@gotgenes/pi-permission-system",
     "npm:pi-opencode-go-provider",
-    "npm:pi-rtk-optimizer"
+    "npm:pi-rtk-optimizer",
+    "npm:remote-pi"
   ],
   "enableSkillCommands": true,
   "lastChangelogVersion": "0.81.1"
