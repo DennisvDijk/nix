@@ -3,6 +3,7 @@
   "private": true,
   "dependencies": {
     "@gotgenes/pi-permission-system": "^20.10.0",
+    "@ujjwalgrover/pi-catppuccin": "1.0.0",
     "pi-opencode-go-provider": "^1.0.5",
     "pi-rtk-optimizer": "^0.9.0",
     "pi-web-access": "^0.13.0",

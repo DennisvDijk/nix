@@ -2,7 +2,7 @@
   "defaultProvider": "omlx",
   "defaultModel": "Qwen3.6-35B-A3B-4bit",
   "defaultThinkingLevel": "high",
-  "theme": "dark",
+  "theme": "catppuccin-mocha",
   "quietStartup": true,
   "enableInstallTelemetry": false,
   "compaction": {
@@ -30,6 +30,7 @@
   "packages": [
     "npm:pi-web-access",
     "npm:@gotgenes/pi-permission-system",
+    "npm:@ujjwalgrover/pi-catppuccin",
     "npm:pi-opencode-go-provider",
     "npm:pi-rtk-optimizer",
     "npm:remote-pi"
