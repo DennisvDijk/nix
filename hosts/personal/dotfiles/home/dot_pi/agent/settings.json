@@ -2,7 +2,7 @@
   "defaultProvider": "omlx",
   "defaultModel": "Qwen3.6-35B-A3B-4bit",
   "defaultThinkingLevel": "high",
-  "theme": "catppuccin-mocha",
+  "theme": "neon-singularity",
   "quietStartup": true,
   "enableInstallTelemetry": false,
   "compaction": {
