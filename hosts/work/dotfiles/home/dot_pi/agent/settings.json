@@ -30,7 +30,6 @@
   "packages": [
     "npm:pi-web-access",
     "npm:@gotgenes/pi-permission-system",
-    "npm:@ujjwalgrover/pi-catppuccin",
     "npm:pi-opencode-go-provider",
     "npm:pi-rtk-optimizer",
     "npm:pi-mcp-adapter"
