@@ -1,0 +1,45 @@
+{
+  "defaultProvider": "omlx",
+  "defaultModel": "Qwen3.6-35B-A3B-4bit",
+  "defaultThinkingLevel": "high",
+  "theme": "neon-singularity",
+  "quietStartup": true,
+  "enableInstallTelemetry": false,
+  "compaction": {
+    "enabled": true,
+    "reserveTokens": 16384,
+    "keepRecentTokens": 20000
+  },
+  "retry": {
+    "enabled": true,
+    "maxRetries": 3,
+    "baseDelayMs": 2000,
+    "provider": {
+      "timeoutMs": 300000,
+      "maxRetries": 0
+    }
+  },
+  "enabledModels": [
+    "omlx/Qwen3.6-35B-A3B-4bit",
+    "omlx/Qwen3.6-27B-4bit",
+    "opencode-go/kimi-k2.7-code",
+    "opencode-go/deepseek-v4-flash",
+    "opencode-go/deepseek-v4-pro",
+    "opencode-go/glm-5.2"
+  ],
+  "packages": [
+    "npm:pi-web-access",
+    "npm:@gotgenes/pi-permission-system",
+    "npm:pi-opencode-go-provider",
+    "npm:pi-rtk-optimizer",
+    "npm:pi-dynamic-workflows",
+    "npm:pi-subagents",
+    "npm:pi-lens",
+    "npm:@vigolium/piolium",
+    "npm:@mjasnikovs/pi-task",
+    "npm:pi-hermes-memory",
+    "npm:pi-mcp-adapter"
+  ],
+  "enableSkillCommands": true,
+  "lastChangelogVersion": "0.81.1"
+}
