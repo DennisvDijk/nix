@@ -229,6 +229,7 @@
 
     # Dotfiles management
     chezmoi
+    duti
   ];
 
   # Work environment variables are exported via chezmoi-managed ~/.zshrc

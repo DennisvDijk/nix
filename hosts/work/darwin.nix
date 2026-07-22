@@ -69,6 +69,7 @@
 
     # ── Browsers ───────────────────────────────────────────────────
     "arc"
+    "finicky"
 
     # ── Terminals ──────────────────────────────────────────────────
     "warp"
@@ -161,6 +162,17 @@
     home-manager
     git
   ];
+
+  # Keep Finicky as the managed HTTPS entry point. Run after Homebrew so a
+  # newly installed Finicky app can become the handler in the same switch.
+  system.activationScripts.postActivation.text = lib.mkAfter ''
+    if [ -x "${pkgs.duti}/bin/duti" ] && [ -d "/Applications/Finicky.app" ]; then
+      echo "Setting Finicky as the default HTTPS handler..."
+      sudo -u ${username} -H ${pkgs.duti}/bin/duti -s se.johnste.finicky https all
+    else
+      echo "Finicky is not installed yet; skipping default HTTPS handler setup."
+    fi
+  '';
 
   # Auto-check Radar updates on every darwin-rebuild switch
   # Runs in --check (non-interactive) mode; prompts you to run update-radar.sh manually if an update is found
