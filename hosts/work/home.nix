@@ -115,7 +115,7 @@
     secrets = {
       work_email          = { };
       gitlab_host         = { };
-      litellm_master_key  = { };
+      litellm_gateway_key = { };
       langfuse_public_key = { };
       langfuse_secret_key = { };
       aws_bedrock_role_arn = { };
@@ -145,6 +145,29 @@
     fi
   '';
 
+  # Export the SOPS-managed credential to a shared, client-neutral location.
+  home.activation.aiGatewayEnv = lib.hm.dag.entryAfter [ "writeBoundary" "sops-nix" ] ''
+    gateway_env="${config.home.homeDirectory}/.config/enexis-ai-gateway/env"
+    old_gateway_env="${config.home.homeDirectory}/.config/opencode/.env"
+    gateway_key=$(cat "${config.sops.secrets.litellm_gateway_key.path}" 2>/dev/null || echo "")
+    case "$gateway_key" in
+      sk-*)
+      umask 077
+      mkdir -p "$(dirname "$gateway_env")"
+      {
+        printf 'ENEXIS_AI_GATEWAY_URL=https://api.ai.enexis.nl/v1\n'
+        printf 'ENEXIS_AI_GATEWAY_KEY=%s\n' "$gateway_key"
+      } > "$gateway_env"
+      chmod 600 "$gateway_env"
+      rm -f "$old_gateway_env"
+      ;;
+      *)
+        rm -f "$gateway_env"
+        echo "aiGatewayEnv: refusing to export an invalid LiteLLM key; replace litellm_gateway_key with a value starting with sk-" >&2
+        ;;
+    esac
+  '';
+
   # TODO: glab config activation — disabled due to upstream home-manager compatibility
   # Re-enable after programs.glab.settings is supported in target home-manager version
   #
@@ -167,17 +190,16 @@
 
   # Activation: deploy dotfiles via chezmoi pointing to local nix repo source
   # Dotfiles live in hosts/work/dotfiles/ — versioned together with this nix config
-  # On first run: initialises chezmoi from the local source and applies (with --force
-  # so pre-existing handwritten dotfiles get overwritten by the repo-managed versions).
+  # On every run: initializes/applies chezmoi from the local source (with --force so
+  # pre-existing handwritten dotfiles get overwritten by the repo-managed versions).
   # To update dotfiles: edit files in hosts/work/dotfiles/, then run 'chezmoi apply'
   # (or rebuild — this activation will re-apply on every home-manager switch).
   home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     dotfiles_source="${config.home.homeDirectory}/.config/nix/hosts/work/dotfiles"
     if [ -d "$dotfiles_source" ]; then
-      # Always apply — nix repo is the single source of truth for these dotfiles.
-      # chezmoi apply --source does not create ~/.local/share/chezmoi, so the old
-      # dir-exists guard was always hitting the init branch anyway.
-      ${pkgs.chezmoi}/bin/chezmoi apply --source "$dotfiles_source" --force
+      # Nix repo is the single source of truth for these dotfiles. init also makes
+      # the source explicit to chezmoi, including the .chezmoiroot=home layout.
+      ${pkgs.chezmoi}/bin/chezmoi init --source "$dotfiles_source" --apply --force
     else
       echo "chezmoi: dotfiles_source $dotfiles_source not found — skipping (symlink ~/.config/nix to your repo checkout)"
     fi

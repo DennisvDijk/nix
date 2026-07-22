@@ -1,7 +1,7 @@
 {
-  "defaultProvider": "omlx",
-  "defaultModel": "Qwen3.6-35B-A3B-4bit",
-  "defaultThinkingLevel": "high",
+  "defaultProvider": "ai-gateway",
+  "defaultModel": "gpt-5.6-luna",
+  "defaultThinkingLevel": "xhigh",
   "theme": "neon-singularity",
   "quietStartup": true,
   "enableInstallTelemetry": false,
@@ -20,12 +20,8 @@
     }
   },
   "enabledModels": [
-    "omlx/Qwen3.6-35B-A3B-4bit",
-    "omlx/Qwen3.6-27B-4bit",
-    "opencode-go/kimi-k2.7-code",
-    "opencode-go/deepseek-v4-flash",
-    "opencode-go/deepseek-v4-pro",
-    "opencode-go/glm-5.2"
+    "ai-gateway/*",
+    "omlx/*"
   ],
   "packages": [
     "npm:pi-web-access",
