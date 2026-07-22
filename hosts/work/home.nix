@@ -195,14 +195,10 @@
   # To update dotfiles: edit files in hosts/work/dotfiles/, then run 'chezmoi apply'
   # (or rebuild — this activation will re-apply on every home-manager switch).
   home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    dotfiles_source="${config.home.homeDirectory}/.config/nix/hosts/work/dotfiles"
-    if [ -d "$dotfiles_source" ]; then
-      # Nix repo is the single source of truth for these dotfiles. init also makes
-      # the source explicit to chezmoi, including the .chezmoiroot=home layout.
-      ${pkgs.chezmoi}/bin/chezmoi init --source "$dotfiles_source" --apply --force
-    else
-      echo "chezmoi: dotfiles_source $dotfiles_source not found — skipping (symlink ~/.config/nix to your repo checkout)"
-    fi
+    dotfiles_source="${./dotfiles}"
+    # The selected Nix flake revision is the source of truth. This avoids
+    # silently using a stale checkout at ~/.config/nix.
+    ${pkgs.chezmoi}/bin/chezmoi --source "$dotfiles_source" apply --force
   '';
 
   # Work-specific packages (beyond features)
