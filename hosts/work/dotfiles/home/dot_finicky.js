@@ -2,7 +2,7 @@ export default {
   defaultBrowser: "Arc",
   handlers: [
     {
-      match: "passwords.enexis.nl/*",
+      match: "password.enexis.nl/*",
       browser: "Google Chrome",
     },
   ],
