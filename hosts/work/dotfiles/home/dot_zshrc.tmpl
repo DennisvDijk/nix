@@ -198,6 +198,13 @@ fi
 export ENEXIS_AI_GATEWAY_URL="https://api.ai.enexis.nl/v1"
 export ENEXIS_AI_GATEWAY_NAME="Enexis AI Gateway, hell yes."
 
+# The work Home Manager activation writes this shared gateway environment.
+if [ -f "$HOME/.config/enexis-ai-gateway/env" ]; then
+  set -a
+  . "$HOME/.config/enexis-ai-gateway/env"
+  set +a
+fi
+
 # Work environment (Enexis AI Platform)
 export WORK_ENV=1
 export NIX_HOST="{{ .chezmoi.hostname }}"
