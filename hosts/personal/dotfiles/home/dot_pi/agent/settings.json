@@ -1,6 +1,6 @@
 {
-  "defaultProvider": "omlx",
-  "defaultModel": "Qwen3.6-35B-A3B-4bit",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "deepseek-v4-flash",
   "defaultThinkingLevel": "high",
   "theme": "neon-singularity",
   "quietStartup": true,
@@ -38,7 +38,8 @@
     "npm:@vigolium/piolium",
     "npm:@mjasnikovs/pi-task",
     "npm:pi-hermes-memory",
-    "npm:remote-pi"
+    "npm:remote-pi",
+    "npm:pi-tool-display"
   ],
   "enableSkillCommands": true,
   "lastChangelogVersion": "0.81.1"

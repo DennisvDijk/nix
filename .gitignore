@@ -39,3 +39,7 @@ secrets/*.yaml.enc
 # Temp files
 *.log
 *.pid
+
+# Stale .pi/ root — chezmoi manages dot_pi/ instead
+.pi/
+
