@@ -6,3 +6,6 @@
 
 # IDE related
 .vscode/
+
+# Stale .pi/ root (not chezmoi-managed; dot_pi/ is the source of truth)
+.pi/

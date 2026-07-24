@@ -1,4 +1,7 @@
 {
+  "debugLog": false,
+  "permissionReviewLog": false,
+  "yoloMode": true,
   "permission": {
     "*": "allow",
     "path": {
