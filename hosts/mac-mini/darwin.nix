@@ -100,8 +100,8 @@
     # Pi setup
     "pi-coding-agent"
 
-    # OpenCode setup
-    "opencode"
+    # OpenCode setup (fully-qualified tap name so Homebrew finds the formula)
+    "anomalyco/tap/opencode"
   ];
 
   # ── Headroom — context compression proxy for pi agents ──────────
