@@ -102,9 +102,6 @@
 
     # OpenCode setup
     "opencode"
-
-    # Utilities
-    "session-manager-plugin"
   ];
 
   # ── Headroom — context compression proxy for pi agents ──────────
