@@ -20,9 +20,10 @@
 
     # Per-host username — work laptop has a different macOS account name
     hostUsers = {
-      personal = "dennisvandijk";
-      work     = "Dennis.van.Dijk";
-      template = "dennisvandijk";
+      personal  = "dennisvandijk";
+      work      = "Dennis.van.Dijk";
+      template  = "dennisvandijk";
+      mac-mini  = "dennisvandijk";
     };
 
     # Helper to create my.* namespace args
@@ -49,7 +50,7 @@
         };
         modules = [ ./hosts/${hostName}/darwin.nix ];
       };
-    }) [ "work" "personal" "template" ]);
+    }) [ "work" "personal" "template" "mac-mini" ]);
 
     # Home Manager configurations
     homeConfigurations = builtins.listToAttrs (map (hostName: {
@@ -74,6 +75,6 @@
           inputs.mac-app-util.homeManagerModules.default
         ];
       };
-    }) [ "work" "personal" "template" ]);
+    }) [ "work" "personal" "template" "mac-mini" ]);
   };
 }
