@@ -5,6 +5,7 @@
   imports = [
     ../shared/home-manager.nix
     ./features
+    ./dotfiles.nix
   ];
 
   nix.settings = {
@@ -18,6 +19,6 @@
     ];
   };
 
-  # chezmoi owns ~/.zshrc. The zsh package is still installed via home.packages.
+  # The checkout's dot_zshrc is symlinked to ~/.zshrc. Don't also generate one.
   programs.zsh.enable = lib.mkForce false;
 }

@@ -89,6 +89,39 @@ fmt:
 check:
     nix flake check
 
+# Show dotfile symlinks for HOST and whether they resolve into the checkout.
+links host=host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    flake="${FLAKE_PATH:-$HOME/.config/nix}"
+    missing=0
+    while IFS= read -r rel; do
+      [[ -z "$rel" ]] && continue
+      target="$HOME/$rel"
+      if [[ -L "$target" ]]; then
+        dest="$target"
+        for _ in 1 2 3 4 5 6; do
+          [[ -L "$dest" ]] || break
+          next=$(readlink "$dest")
+          case "$next" in
+            /*) dest="$next" ;;
+            *) dest="$(cd "$(dirname "$dest")" && pwd)/$next" ;;
+          esac
+        done
+        case "$dest" in
+          "$flake"/*) printf 'ok   %s\n' "$rel" ;;
+          *) printf '??   %s -> %s\n' "$rel" "$dest" ;;
+        esac
+      elif [[ -e "$target" ]]; then
+        printf 'file %s (not a symlink yet)\n' "$rel"
+        missing=1
+      else
+        printf 'miss %s\n' "$rel"
+        missing=1
+      fi
+    done < <(nix eval --raw ".#homeConfigurations.{{host}}.config.home.file" --apply 'files: builtins.concatStringsSep "\n" (builtins.attrNames files)')
+    exit "$missing"
+
 # Evaluate every host without building. Prints the system and home paths.
 eval:
     #!/usr/bin/env bash

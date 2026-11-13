@@ -15,7 +15,7 @@
   # Enexis AI Platform. Only the overrides; module defaults cover the rest.
   my.features = {
     shell = {
-      # chezmoi owns ~/.zshrc, starship.toml, and atuin/config.toml.
+      # ~/.zshrc, starship.toml, and atuin/config.toml are checkout symlinks.
       starship.enable = false;
       atuin.enable = false;
     };
@@ -43,6 +43,8 @@
       localLLMs.enable = false; # data residency + RAM
     };
   };
+
+  my.dotfiles.root = "hosts/work/dotfiles/home";
 
   # Git email comes from SOPS, not the personal default.
   my.user.email.git = "";
@@ -129,22 +131,9 @@
   #   fi
   # '';
 
-  # Activation: deploy dotfiles via chezmoi pointing to local nix repo source
-  # Dotfiles live in hosts/work/dotfiles/ — versioned together with this nix config
-  # On every run: initializes/applies chezmoi from the local source (with --force so
-  # pre-existing handwritten dotfiles get overwritten by the repo-managed versions).
-  # To update dotfiles: edit files in hosts/work/dotfiles/, then run 'chezmoi apply'
-  # (or rebuild — this activation will re-apply on every home-manager switch).
-  home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    dotfiles_source="${./dotfiles}"
-    # The selected Nix flake revision is the source of truth. This avoids
-    # silently using a stale checkout at ~/.config/nix.
-    ${pkgs.chezmoi}/bin/chezmoi --source "$dotfiles_source" apply --force
-  '';
-
   # Work-specific packages (beyond features)
   home.packages = with pkgs; [
-    # Shell (chezmoi-managed config — see programs.zsh.enable override above)
+    # Shell. ~/.zshrc is the checkout symlink, not a generated file.
     zsh
     zsh-autosuggestions
     zsh-syntax-highlighting
@@ -164,12 +153,6 @@
 
     # AWS SSM — installed via Homebrew (see hosts/work/darwin.nix)
 
-    # Dotfiles management
-    chezmoi
     duti
   ];
-
-  # Work environment variables are exported via chezmoi-managed ~/.zshrc
-  # (see hosts/work/dotfiles/home/dot_zshrc.tmpl — WORK_ENV, NIX_HOST, AWS_*).
-  # Host name and username are interpolated by chezmoi templates from ~/.config/chezmoi.
 }

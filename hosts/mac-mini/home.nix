@@ -3,12 +3,7 @@
 # Inherits pi setup (opencode, pi-coding-agent) and personal dotfiles.
 # No AI/LLM tools, no comms, no media apps.
 
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
+{ pkgs, ... }:
 
 {
   imports = [ ../../modules/home/common.nix ];
@@ -36,24 +31,11 @@
     };
   };
 
-  # ── Dotfiles ────────────────────────────────────────────────────
-  # Reuse personal dotfiles (same chezmoi source as MacBook).
-  # pi/opencode config, zshrc, starship.toml, etc. all come from here.
-  home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    dotfiles_source="${config.home.homeDirectory}/.config/nix/hosts/personal/dotfiles"
-    chezmoi_dir="${config.home.homeDirectory}/.local/share/chezmoi"
-    if [ -d "$dotfiles_source" ]; then
-      if [ ! -d "$chezmoi_dir" ]; then
-        echo "chezmoi: initialising from personal dotfiles..."
-        ${pkgs.chezmoi}/bin/chezmoi init --source "$dotfiles_source" --apply --force
-      else
-        ${pkgs.chezmoi}/bin/chezmoi apply --source "$dotfiles_source" --force
-      fi
-    fi
-  '';
+  # Same tree as personal, including ~/.aerospace.toml. There is no second copy.
+  my.dotfiles.root = "hosts/personal/dotfiles/home";
 
   # ── Packages ────────────────────────────────────────────────────
-  # Shell (chezmoi-managed config — see programs.zsh.enable override above)
+  # Shell. ~/.zshrc is the checkout symlink, not a generated file.
   home.packages = with pkgs; [
     zsh
     zsh-autosuggestions
@@ -71,8 +53,6 @@
     imagemagick
     mosh
 
-    # Dotfiles management
-    chezmoi
     duti
   ];
 

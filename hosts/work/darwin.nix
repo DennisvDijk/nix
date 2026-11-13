@@ -15,7 +15,7 @@
     ../../modules/darwin/common.nix
     inputs.mac-app-util.darwinModules.default
     # No sketchybar — that's a personal desktop tool.
-    # Aerospace is installed via the Homebrew cask below; chezmoi manages its config.
+    # Aerospace config is ~/.aerospace.toml, a Home Manager symlink.
   ];
 
   my.darwin.homebrew.brews.enable = true;

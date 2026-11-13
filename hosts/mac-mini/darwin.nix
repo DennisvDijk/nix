@@ -1,7 +1,7 @@
 # hosts/mac-mini/darwin.nix
 # Mac Mini — headless home server
 # Runs Hermes (docker/media stack), pi-coding-agent, opencode
-# Uses personal chezmoi dotfiles (same identity as personal host)
+# Uses the personal dotfiles (same files as the personal MacBook).
 
 {
   pkgs,

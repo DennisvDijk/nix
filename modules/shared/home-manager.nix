@@ -45,9 +45,6 @@
     delta # Git pager
     git # Git
 
-    # === Dotfile Manager ===
-    chezmoi # Dotfile manager
-
     # === Editor ===
     neovim # Editor
 

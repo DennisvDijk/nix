@@ -82,7 +82,7 @@ in
     ];
 
     # AI tool configurations
-    # Note: OpenCode configuration is managed by chezmoi dotfiles
+    # OpenCode's config is a symlink into the checkout (modules/home/dotfiles.nix).
     # (hosts/{personal,work}/dotfiles/home/dot_config/opencode/)
 
     # Shell aliases for AI tools

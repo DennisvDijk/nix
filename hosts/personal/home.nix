@@ -1,12 +1,7 @@
 # hosts/personal/home.nix
 # Personal host home configuration using feature flags
 
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -18,7 +13,7 @@
   # (see modules/home/features and modules/home/features/user-secrets.nix).
   my.features = {
     shell = {
-      # chezmoi owns ~/.zshrc and the starship config.
+      # ~/.zshrc and starship.toml are symlinks into this checkout.
       starship.enable = false;
       atuin.enable = false;
     };
@@ -40,6 +35,8 @@
     devtools.enable = true;
   };
 
+  my.dotfiles.root = "hosts/personal/dotfiles/home";
+
   # SOPS configuration for secret management (API keys, tokens, passwords)
   sops = {
     age.keyFile = "/Users/dennisvandijk/Library/Application Support/sops/age/keys.txt";
@@ -50,7 +47,7 @@
 
   # Personal-specific packages (things not covered by features)
   home.packages = with pkgs; [
-    # Shell (chezmoi-managed config — see programs.zsh.enable override above)
+    # Shell. ~/.zshrc is the checkout symlink, not a generated file.
     zsh
     zsh-autosuggestions
     zsh-syntax-highlighting
@@ -68,18 +65,4 @@
     moonlight-qt
     mosh
   ];
-
-  # Run chezmoi init/apply on every home-manager switch (chezmoi owns ~/.zshrc)
-  home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    dotfiles_source="${config.home.homeDirectory}/.config/nix/hosts/personal/dotfiles"
-    chezmoi_dir="${config.home.homeDirectory}/.local/share/chezmoi"
-    if [ -d "$dotfiles_source" ]; then
-      if [ ! -d "$chezmoi_dir" ]; then
-        echo "chezmoi: initialising from local nix repo source..."
-        ${pkgs.chezmoi}/bin/chezmoi init --source "$dotfiles_source" --apply --force
-      else
-        ${pkgs.chezmoi}/bin/chezmoi apply --source "$dotfiles_source" --force
-      fi
-    fi
-  '';
 }
