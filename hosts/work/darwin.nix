@@ -6,14 +6,12 @@
   pkgs,
   lib,
   username,
-  inputs,
   ...
 }:
 
 {
   imports = [
     ../../modules/darwin/common.nix
-    inputs.mac-app-util.darwinModules.default
     # No sketchybar — that's a personal desktop tool.
     # Aerospace config is ~/.aerospace.toml, a Home Manager symlink.
   ];

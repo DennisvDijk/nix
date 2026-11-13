@@ -77,8 +77,6 @@
   "export": {
     "pageBg": "#05030d",
     "cardBg": "#120d2b",
-    "infoBg": "#1b1240",
-    "text": "#e7f7ff",
-    "muted": "#8291a8"
+    "infoBg": "#1b1240"
   }
 }
