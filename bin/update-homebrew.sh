@@ -1,10 +1,11 @@
 #!/bin/bash
 
-DARWIN_NIX="$HOME/.config/nix/modules/shared/darwin.nix"
+BREW_NIX="$HOME/.config/nix/modules/darwin/features/homebrew.nix"
 
 echo "📦 Homebrew packages synchroniseren..."
 echo "⚠️  Let op: Dit script toont de geïnstalleerde packages."
-echo "         Voeg ze handmatig toe aan modules/shared/darwin.nix"
+echo "         Gedeelde casks/brews: modules/darwin/features/homebrew.nix"
+echo "         Host-specifiek: hosts/<host>/darwin.nix"
 echo ""
 
 # Haal alle geïnstalleerde brews en casks op
@@ -16,4 +17,5 @@ echo "📦 Geïnstalleerde casks:"
 brew list --cask
 
 echo ""
-echo "✅ Voeg de gewenste packages toe aan: $DARWIN_NIX"
+echo "✅ Voeg de gewenste packages toe aan: $BREW_NIX"
+echo "   of aan hosts/<host>/darwin.nix voor één machine."
