@@ -9,7 +9,10 @@
 }:
 
 {
-  imports = [ ../../modules/home/common.nix ];
+  imports = [
+    ../../modules/home/common.nix
+    ../../modules/home/sketchybar.nix
+  ];
 
   # Only overrides. Everything else is the module default
   # (see modules/home/features and modules/home/features/user-secrets.nix).

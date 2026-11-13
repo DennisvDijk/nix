@@ -13,20 +13,24 @@ Dotfiles are applied by chezmoi from `hosts/<host>/dotfiles` (the mini points at
 
 ## Everyday commands
 
-From a checkout of this repo, with flakes enabled:
+`just` is the front door. `nix develop` puts it on your PATH. With no arguments it lists every recipe. The host defaults to `$NIX_HOST`, then `personal`.
 
 ```bash
-just switch personal     # sudo darwin-rebuild switch --flake .#personal
-just home personal       # home-manager switch --flake .#personal
-just all work            # both, for the work host
-just update              # nix flake update
-just fmt                 # nix fmt  (nixfmt, RFC 166)
-just check               # nix flake check  (deadnix + statix)
+just                  # list recipes
+just personal         # darwin-rebuild, then home-manager, for that host
+just work
+just mac-mini
+just diff             # what a Darwin switch would change vs /run/current-system
+just diff-home work
+just gc               # nix-collect-garbage --delete-older-than 7d
+just rollback         # previous Darwin generation
+just rollback-home    # previous Home Manager generation
+just update           # nix flake update
+just fmt              # nix fmt (nixfmt, RFC 166)
+just check            # deadnix + statix
 ```
 
-`just` is in the devshell (`nix develop`). The same commands exist as flake apps: `nix run .#switch -- personal`, `nix run .#home -- work`, `nix run .#fmt`, `nix run .#update`, `nix run .#check`.
-
-The host defaults to `$NIX_HOST`, then `personal`.
+`just switch personal` and `just home personal` are the two halves of `just personal`. The same switch, home, update, fmt, and check commands exist as `nix run .#switch -- personal` and so on.
 
 ## Layout
 
@@ -67,7 +71,8 @@ Search first: `./bin/search_package.sh <name>`.
 - Nix itself is `nix.enable = false` because these Macs run Determinate Nix.
 - chezmoi owns `~/.zshrc`, so Home Manager's zsh *config* is off. The zsh package is still installed.
 - `mac-app-util` keeps its own nixpkgs pin (it needs a specific SBCL and dockutil). The other inputs follow this flake's nixpkgs.
-- `modules/home/apps/orion.nix`, `modules/home/apps/vscode/extensions.nix`, and `modules/home/darwin/casks.nix` are not imported. They are still in the tree so those settings are not thrown away.
-- `modules/config/sketchybar/` and `modules/config/Dracula.itermcolors` are not wired into a module. SketchyBar on the personal Mac is installed, but its rc is not deployed by Nix. Aerospace's toml copy on the mini is a valid activation script and, as before, nix-darwin does not run custom script names.
+- Personal Home Manager installs `~/.config/sketchybar/sketchybarrc` and `workspace_update.sh`. The package is still installed by the Darwin module.
+- The Mac mini copies `modules/config/aerospace.toml` to `~/.config/aerospace/aerospace.toml` on every `darwin-rebuild`. Chezmoi also deploys `~/.aerospace.toml` from the personal dotfiles. AeroSpace uses whichever of those it finds first.
+- `modules/config/Dracula.itermcolors` is not applied. iTerm only imports that file when you open it, and writing the preference plist would override the current profile.
 - `skills-lock.json` is a pi-agent skills lock. The flake does not read it.
 - The `get-shit-done` trees under both chezmoi sources are identical vendored app data. They are what GitHub used to count as JavaScript. `.gitattributes` marks them vendored. They are still deployed.

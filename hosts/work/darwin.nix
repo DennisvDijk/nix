@@ -124,6 +124,9 @@
 
   # Keep Finicky as the managed HTTPS entry point. Run after Homebrew so a
   # newly installed Finicky app can become the handler in the same switch.
+  # postActivation is one of the script names nix-darwin actually runs.
+  # Finicky and the Radar check both belong here. checkRadarUpdate was a
+  # custom name, so the Radar check never ran.
   system.activationScripts.postActivation.text = lib.mkAfter ''
     if [ -x "${pkgs.duti}/bin/duti" ] && [ -d "/Applications/Finicky.app" ]; then
       echo "Setting Finicky as the default HTTPS handler..."
@@ -131,20 +134,15 @@
     else
       echo "Finicky is not installed yet; skipping default HTTPS handler setup."
     fi
-  '';
 
-  # Auto-check Radar updates on every darwin-rebuild switch
-  # Runs in --check (non-interactive) mode; prompts you to run update-radar.sh manually if an update is found
-  system.activationScripts.checkRadarUpdate = {
-    text = ''
-      if command -v brew &>/dev/null && brew list radar &>/dev/null 2>&1; then
-        echo "Checking Skyhook Radar for updates..."
-        "$HOME/.config/nix/bin/update-radar.sh" --check \
-          && echo "  Radar is up to date." \
-          || echo "  Run ~/.config/nix/bin/update-radar.sh to review and apply the update."
-      fi
-    '';
-  };
+    # --check is read-only. Run as the user so Homebrew sees their cellar.
+    if sudo -u ${username} -H /opt/homebrew/bin/brew list radar >/dev/null 2>&1; then
+      echo "Checking Skyhook Radar for updates..."
+      sudo -u ${username} -H "/Users/${username}/.config/nix/bin/update-radar.sh" --check \
+        && echo "  Radar is up to date." \
+        || echo "  Run ~/.config/nix/bin/update-radar.sh to review and apply the update."
+    fi
+  '';
 
   # Daily background check — pops a macOS notification if an update is available
   environment.systemPackages = with pkgs; [

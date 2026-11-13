@@ -1,16 +1,20 @@
-{ pkgs, ... }:
-
+# AeroSpace package plus the managed config.
+# nix-darwin only executes a fixed set of activation script names, so the
+# copy is appended to postActivation (the hook that actually runs).
 {
-  environment.systemPackages = with pkgs; [
-    aerospace
-  ];
+  pkgs,
+  lib,
+  username,
+  ...
+}:
+{
+  environment.systemPackages = [ pkgs.aerospace ];
 
-  # nix-darwin only runs a fixed set of activation script names. This text is
-  # kept (and is now a valid submodule) but is not executed, matching the
-  # previous configuration. Append it to `postActivation.text` to actually
-  # install the toml on switch.
-  system.activationScripts.aerospace.text = ''
-    mkdir -p ~/.config/aerospace
-    cp ${./../../config/aerospace.toml} ~/.config/aerospace/aerospace.toml
+  system.activationScripts.postActivation.text = lib.mkAfter ''
+    # Activation runs as root; write the user's config, not /var/root.
+    dest="/Users/${username}/.config/aerospace"
+    ${pkgs.coreutils}/bin/install -d -o ${username} -g staff -m 755 "$dest"
+    ${pkgs.coreutils}/bin/install -o ${username} -g staff -m 644 \
+      ${../../config/aerospace.toml} "$dest/aerospace.toml"
   '';
 }
