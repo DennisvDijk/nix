@@ -18,11 +18,6 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # Intentionally not followed. mac-app-util pins nixpkgs for a known-good
-    # SBCL and dockutil (see that flake's comment). Following root nixpkgs
-    # would rebuild the trampoline against an untested compiler.
-    mac-app-util.url = "github:hraban/mac-app-util";
   };
 
   outputs =

@@ -55,7 +55,6 @@ let
       modules = [
         ../hosts/${hostName}/home.nix
         inputs.sops-nix.homeManagerModules.sops
-        inputs.mac-app-util.homeManagerModules.default
       ];
     }
   ) hosts;

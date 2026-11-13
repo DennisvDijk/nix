@@ -4,7 +4,6 @@
 {
   pkgs,
   lib,
-  inputs,
   ...
 }:
 
@@ -13,7 +12,6 @@
     ../../modules/darwin/common.nix
     ../../modules/shared/services/sketchybar.nix
     ../../modules/shared/services/headroom.nix
-    inputs.mac-app-util.darwinModules.default
   ];
 
   # llama.cpp and omlx come from the shared Homebrew module.

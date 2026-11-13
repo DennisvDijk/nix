@@ -104,7 +104,6 @@ Whether Handy is redundant next to TypeWhisper is an open question. Both stay in
 
 - Nix itself is `nix.enable = false` because these Macs run Determinate Nix.
 - `~/.zshrc` is a symlink into the checkout, so Home Manager does not generate a second one. The zsh package is still installed.
-- `mac-app-util` keeps its own nixpkgs pin (it needs a specific SBCL and dockutil). The other inputs follow this flake's nixpkgs.
 - Personal Home Manager also installs `~/.config/sketchybar/sketchybarrc` and `workspace_update.sh` from `modules/config/sketchybar`. Those two are copies in the Nix store. SketchyBar rewrites its own config through them poorly, which is why the other dotfiles are checkout symlinks instead.
 - AeroSpace has one config, `~/.aerospace.toml`, on the laptops. The mini does not run AeroSpace.
 - `modules/config/Dracula.itermcolors` is not applied. iTerm only imports that file when you open it, and writing the preference plist would override the current profile.
