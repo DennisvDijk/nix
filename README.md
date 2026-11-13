@@ -11,7 +11,7 @@ nix-darwin and Home Manager for Dennis van Dijk's Macs. One flake, four hosts, a
 
 Dotfiles for the laptops live in `hosts/<host>/dotfiles`. The mini has its own small tree at `hosts/mac-mini/dotfiles` (`~/.zshrc` and `~/.pi`). Home Manager symlinks them from the checkout at `my.flakePath` (default `~/.config/nix`), so they stay writable. The get-shit-done tree is shared at `dotfiles/get-shit-done` and is not installed on the mini. Secrets are sops-encrypted in `secrets/`.
 
-The mini runs Colima as a LaunchDaemon (boot, as `dennisvandijk`, no GUI login) and Pi 1.5.2 from nix. `just mini-docker-status` and `just mini-pi` are meant to be run on that machine. SSH, never-sleep, restart after power failure, and a nightly `nix-collect-garbage` plus `nix-store --optimise` are part of the Darwin config. Nix GC is a LaunchDaemon because Determinate Nix keeps `nix.enable = false`, and nix-darwin will not install its own GC job in that case.
+The mini runs Colima as a LaunchDaemon (boot, as `dennisvandijk`, no GUI login) and Pi 1.5.2 from nix. Tailscale is nix-darwin's `services.tailscale` (`tailscaled` at boot), not the `tailscale-app` cask. After the first switch, run `sudo tailscale up` once (add `--ssh` if you want Tailscale SSH). `just mini-docker-status` and `just mini-pi` are meant to be run on that machine. SSH, never-sleep, restart after power failure, and a nightly `nix-collect-garbage` plus `nix-store --optimise` are part of the Darwin config. Nix GC is a LaunchDaemon because Determinate Nix keeps `nix.enable = false`, and nix-darwin will not install its own GC job in that case.
 
 ## Everyday commands
 

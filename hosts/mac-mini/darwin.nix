@@ -32,6 +32,11 @@ in
   # without anyone logging into the GUI.
   services.openssh.enable = true;
 
+  # Tailscale's system daemon (tailscaled), not the Homebrew menu-bar app.
+  # nix-darwin starts it at boot with RunAtLoad. `tailscale up` is still
+  # a one-time login; overrideLocalDns stays off so macOS DNS is unchanged.
+  services.tailscale.enable = true;
+
   power.sleep.computer = "never";
   power.sleep.display = "never";
   power.sleep.harddisk = "never";
