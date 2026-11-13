@@ -1,4 +1,5 @@
 {
+  "$schema": "https://pi.dev/schemas/models.schema.json",
   "providers": {
     "omlx": {
       "baseUrl": "http://127.0.0.1:8000/v1",

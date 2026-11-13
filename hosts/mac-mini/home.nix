@@ -1,4 +1,5 @@
-# Headless Mac mini. Pi's config and the shell rc are symlinks into this checkout.
+# Headless Mac mini. The shell rc and Pi's settings file are symlinks into this checkout.
+# The rest of ~/.pi (sessions, caches, anything Pi writes) is not managed.
 {
   config,
   pkgs,
@@ -59,6 +60,6 @@ in
 
   home.file = {
     ".zshrc" = link "hosts/mac-mini/dotfiles/zshrc";
-    ".pi" = link "hosts/mac-mini/dotfiles/pi";
+    ".pi/agent/settings.json" = link "hosts/mac-mini/dotfiles/pi/agent/settings.json";
   };
 }

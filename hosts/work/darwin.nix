@@ -19,6 +19,8 @@
   ];
 
   my.darwin.homebrew.brews.enable = true;
+  # The OpenCode CLI is the Nix package from the agent stack. The desktop cask stays.
+  my.darwin.homebrew.opencodeCli.enable = false;
 
   # Work-specific Homebrew casks
   # NOTE: awscli2 + azure-cli are installed via Nix (k8s.cloud.enable) — not via brew

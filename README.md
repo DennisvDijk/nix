@@ -9,7 +9,7 @@ nix-darwin and Home Manager for Dennis van Dijk's Macs. One flake, four hosts, a
 | `mac-mini` | Headless server: Colima and Pi. No GUI apps | `dennisvandijk` |
 | `template` | Starting point for another Mac | `dennisvandijk` |
 
-Dotfiles for the laptops live in `hosts/<host>/dotfiles`. The mini has its own small tree at `hosts/mac-mini/dotfiles` (`~/.zshrc` and `~/.pi`). Home Manager symlinks them from the checkout at `my.flakePath` (default `~/.config/nix`), so they stay writable. The get-shit-done tree is shared at `dotfiles/get-shit-done` and is not installed on the mini. Secrets are sops-encrypted in `secrets/`.
+Dotfiles for the laptops live in `hosts/<host>/dotfiles`. The mini has its own small tree at `hosts/mac-mini/dotfiles` (`~/.zshrc` and `~/.pi`). Home Manager symlinks them from the checkout at `my.flakePath` (default `~/.config/nix`), so they stay writable. Secrets are sops-encrypted in `secrets/`. Get Shit Done is not installed.
 
 The mini runs Colima as a LaunchDaemon (boot, as `dennisvandijk`, no GUI login) and Pi 1.5.2 from nix. Tailscale is nix-darwin's `services.tailscale` (`tailscaled` at boot), not the `tailscale-app` cask. After the first switch, run `sudo tailscale up` once (add `--ssh` if you want Tailscale SSH). `just mini-docker-status` and `just mini-pi` are meant to be run on that machine. SSH, never-sleep, restart after power failure, and a nightly `nix-collect-garbage` plus `nix-store --optimise` are part of the Darwin config. Nix GC is a LaunchDaemon because Determinate Nix keeps `nix.enable = false`, and nix-darwin will not install its own GC job in that case.
 
@@ -77,9 +77,9 @@ Search first: `./bin/search_package.sh <name>`.
 
 ## Agent stack (personal and work)
 
-`my.features.ai.agentStack.enable` installs Pi 1.5.2 and worktrunk (`wt`) from pins in this repo. The locked nixpkgs has neither `pi-coding-agent` nor `worktrunk`. cmux stays the Homebrew cask it already was. The mini does not get this option: tmux (`just mini-pi`) already keeps a Pi session across an SSH drop, and herdr would be a second multiplexer.
+`my.features.ai.agentStack.enable` installs Pi 1.5.2, OpenCode 1.19.5, and worktrunk (`wt`) from pins in this repo. The locked nixpkgs has neither current package (`opencode` there is 1.1.47). cmux stays the Homebrew cask it already was. The mini does not get this option: tmux (`just mini-pi`) already keeps a Pi session across an SSH drop, and herdr would be a second multiplexer.
 
-`~/.pi` is still the out-of-store symlink. Personal default stays `opencode-go/deepseek-v4-flash` with oMLX at `http://127.0.0.1:8000/v1`. Work stays `ai-gateway/gpt-5.6-luna`. `settings.json` adds the schema URL, `lastChangelogVersion` `1.5.2`, and `npm:pi-worktrunk`. The cmux Pi extension is the upstream hook, vendored as `~/.pi/agent/extensions/cmux-session.ts`. It no-ops outside cmux. `~/.config/worktrunk/config.toml` only sets `worktree-path`.
+Nix links one OpenCode file and, for Pi, `settings.json` plus `models.json` (Pi's schema keeps provider endpoints in that second file). Personal Pi stays `opencode-go/deepseek-v4-flash` with oMLX at `http://127.0.0.1:8000/v1`. Work Pi stays `ai-gateway/gpt-5.6-luna`. Skills, themes, sessions, and caches are not in the repo. `npm:pi-worktrunk` is the only extra package in the laptop settings. The cmux hook is not vendored: `just agent-setup` runs `cmux hooks setup pi`, which writes it under `~/.pi`. `~/.config/worktrunk/config.toml` only sets `worktree-path`.
 
 One-time on each laptop, after `just home`:
 

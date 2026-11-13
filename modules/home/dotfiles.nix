@@ -59,7 +59,6 @@ let
     }) files
   );
 
-  gsd = link "${config.my.flakePath}/dotfiles/get-shit-done";
 in
 {
   options.my.flakePath = lib.mkOption {
@@ -75,8 +74,6 @@ in
   };
 
   config = lib.mkIf (cfg.root != null) {
-    home.file = fileLinks // {
-      ".config/opencode/get-shit-done" = gsd;
-    };
+    home.file = fileLinks;
   };
 }

@@ -16,7 +16,9 @@
     inputs.mac-app-util.darwinModules.default
   ];
 
-  # opencode, llama.cpp, and omlx come from the shared Homebrew module.
+  # llama.cpp and omlx come from the shared Homebrew module.
+  # The OpenCode CLI is the Nix package from the agent stack, not this formula.
+  my.darwin.homebrew.opencodeCli.enable = false;
   my.darwin.homebrew.brews.enable = true;
 
   # Personal-specific Homebrew casks

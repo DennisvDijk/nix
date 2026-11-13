@@ -3,21 +3,11 @@
   "defaultProvider": "opencode-go",
   "defaultModel": "deepseek-v4-flash",
   "defaultThinkingLevel": "high",
-  "theme": "neon-singularity",
   "quietStartup": true,
   "enableInstallTelemetry": false,
-  "compaction": {
-    "enabled": true,
-    "reserveTokens": 16384,
-    "keepRecentTokens": 20000
-  },
   "retry": {
-    "enabled": true,
-    "maxRetries": 3,
-    "baseDelayMs": 2000,
     "provider": {
-      "timeoutMs": 300000,
-      "maxRetries": 0
+      "timeoutMs": 300000
     }
   },
   "enabledModels": [
@@ -29,20 +19,7 @@
     "opencode-go/glm-5.2"
   ],
   "packages": [
-    "npm:pi-web-access",
-    "npm:@gotgenes/pi-permission-system",
     "npm:pi-opencode-go-provider",
-    "npm:pi-rtk-optimizer",
-    "npm:pi-dynamic-workflows",
-    "npm:pi-subagents",
-    "npm:pi-lens",
-    "npm:@vigolium/piolium",
-    "npm:@mjasnikovs/pi-task",
-    "npm:pi-hermes-memory",
-    "npm:remote-pi",
-    "npm:pi-tool-display",
     "npm:pi-worktrunk"
-  ],
-  "enableSkillCommands": true,
-  "lastChangelogVersion": "1.5.2"
+  ]
 }

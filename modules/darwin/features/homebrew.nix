@@ -30,6 +30,12 @@ in
     brews.enable = mkEnableOption "CLI tools via Homebrew" // {
       default = false;
     }; # Prefer Nix!
+
+    # The OpenCode CLI is a Nix package on personal and work. The template
+    # still installs the Homebrew formula.
+    opencodeCli.enable = mkEnableOption "Homebrew opencode formula" // {
+      default = true;
+    };
     mas.enable = mkEnableOption "Mac App Store apps" // {
       default = false;
     };
@@ -52,12 +58,16 @@ in
       # 3. GPU-accelerated tools (Ollama)
       # 4. Tools that auto-update themselves
 
-      brews = mkIf cfg.brews.enable [
-        # Only put here what CANNOT be in Nix
-        "opencode"
-        "llama.cpp" # For running models like Gemma directly
-        "omlx"
-      ];
+      brews = mkIf cfg.brews.enable (
+        lib.optionals cfg.opencodeCli.enable [
+          "opencode"
+        ]
+        ++ [
+          # Only put here what CANNOT be in Nix
+          "llama.cpp" # For running models like Gemma directly
+          "omlx"
+        ]
+      );
 
       casks = mkIf cfg.casks.enable [
         # Browsers (universal)

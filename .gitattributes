@@ -1,4 +1,4 @@
-# Vendored chezmoi trees (get-shit-done, pi agent, …) are deployed config,
+# Vendored dotfiles (Pi agent, OpenCode skills, …) are deployed config,
 # not the language of this repository. Without this, GitHub classifies
 # the repo as JavaScript.
 hosts/**/dotfiles/** linguist-vendored
