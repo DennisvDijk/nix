@@ -6,10 +6,12 @@ nix-darwin and Home Manager for Dennis van Dijk's Macs. One flake, four hosts, a
 | --- | --- | --- |
 | `personal` | Personal MacBook | `dennisvandijk` |
 | `work` | Work laptop (Enexis) | `Dennis.van.Dijk` |
-| `mac-mini` | Headless home server. Uses the personal dotfiles | `dennisvandijk` |
+| `mac-mini` | Headless server: Colima and Pi. No GUI apps | `dennisvandijk` |
 | `template` | Starting point for another Mac | `dennisvandijk` |
 
-Dotfiles live in `hosts/<host>/dotfiles` (the mini uses the personal tree). Home Manager symlinks them from the checkout at `my.flakePath` (default `~/.config/nix`), so they stay writable. The get-shit-done tree is shared at `dotfiles/get-shit-done`. Secrets are sops-encrypted in `secrets/`.
+Dotfiles for the laptops live in `hosts/<host>/dotfiles`. The mini has its own small tree at `hosts/mac-mini/dotfiles` (`~/.zshrc` and `~/.pi`). Home Manager symlinks them from the checkout at `my.flakePath` (default `~/.config/nix`), so they stay writable. The get-shit-done tree is shared at `dotfiles/get-shit-done` and is not installed on the mini. Secrets are sops-encrypted in `secrets/`.
+
+The mini runs Colima as a LaunchDaemon (boot, as `dennisvandijk`, no GUI login) and Pi 1.5.2 from nix. `just mini-docker-status` and `just mini-pi` are meant to be run on that machine. SSH, never-sleep, restart after power failure, and a nightly `nix-collect-garbage` plus `nix-store --optimise` are part of the Darwin config. Nix GC is a LaunchDaemon because Determinate Nix keeps `nix.enable = false`, and nix-darwin will not install its own GC job in that case.
 
 ## Everyday commands
 
@@ -19,7 +21,9 @@ Dotfiles live in `hosts/<host>/dotfiles` (the mini uses the personal tree). Home
 just                  # list recipes
 just personal         # darwin-rebuild, then home-manager, for that host
 just work
-just mac-mini
+just mac-mini         # switch the mini
+just mini-docker-status
+just mini-pi          # tmux session named pi; run on the mini
 just diff             # what a Darwin switch would change vs /run/current-system
 just diff-home work
 just gc               # nix-collect-garbage --delete-older-than 7d
@@ -73,7 +77,7 @@ Search first: `./bin/search_package.sh <name>`.
 - `~/.zshrc` is a symlink into the checkout, so Home Manager does not generate a second one. The zsh package is still installed.
 - `mac-app-util` keeps its own nixpkgs pin (it needs a specific SBCL and dockutil). The other inputs follow this flake's nixpkgs.
 - Personal Home Manager also installs `~/.config/sketchybar/sketchybarrc` and `workspace_update.sh` from `modules/config/sketchybar`. Those two are copies in the Nix store. SketchyBar rewrites its own config through them poorly, which is why the other dotfiles are checkout symlinks instead.
-- AeroSpace has one config, `~/.aerospace.toml`. Personal and the mini share the personal file. Work has its own.
+- AeroSpace has one config, `~/.aerospace.toml`, on the laptops. The mini does not run AeroSpace.
 - `modules/config/Dracula.itermcolors` is not applied. iTerm only imports that file when you open it, and writing the preference plist would override the current profile.
 - `skills-lock.json` is a pi-agent skills lock. The flake does not read it.
 - On a Mac that already has chezmoi's copies, the first `just home` replaces those regular files (`force = true`) and leaves a backup. Then delete `~/.local/share/chezmoi` and `~/.config/chezmoi`.

@@ -34,6 +34,17 @@ work:
 mac-mini:
     just all mac-mini
 
+# Colima and the Docker socket. Run this on the mini.
+mini-docker-status:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    colima status
+    docker info
+
+# Attach the pi coding session, creating it if SSH dropped it.
+mini-pi:
+    tmux new-session -A -s pi pi
+
 template:
     just all template
 
