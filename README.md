@@ -136,6 +136,19 @@ nix-full-rebuild
 ./bin/add-package.sh package-name
 ```
 
+## Nix development tools
+
+A pinned flake shell provides the Nix authoring tools used by this repository:
+
+```sh
+nix develop
+nix fmt -- flake.nix   # pass paths to scope formatting
+statix check .
+deadnix --fail .
+```
+
+The personal Home Manager profile includes `cachix`, `deadnix`, `nixd`, `nixfmt`, `nix-tree`, and `statix`; the work profile does not. Existing repository lint findings mean `statix` and `deadnix` are diagnostics, not clean CI gates yet. Personal uses Antigravity CLI for Google's consumer migration; work retains Gemini CLI for Enterprise access.
+
 ## 🎯 Configuration Philosophy
 
 ### Modular Design

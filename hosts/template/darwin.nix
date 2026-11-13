@@ -1,8 +1,8 @@
-{ config, pkgs, lib, username, hostName, ... }:
+{ pkgs, username, hostName, ... }:
 
 {
   imports = [
-    ../../modules/shared/darwin.nix
+    ../../modules/darwin/features
   ];
 
   # Host identification

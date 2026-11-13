@@ -44,7 +44,7 @@ in
         # yarn
         
         # Node tools
-        nodePackages.npm-check-updates
+        npm-check-updates
       ]))
       
       (mkIf cfg.python.enable (with pkgs; [

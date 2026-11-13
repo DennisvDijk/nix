@@ -1,7 +1,7 @@
 # hosts/personal/home.nix
 # Personal host home configuration using feature flags
 
-{ config, pkgs, lib, inputs, username, hostName, ... }:
+{ config, pkgs, lib, username, ... }:
 
 {
   imports = [
@@ -129,6 +129,14 @@
     mcfly
     hstr
     pay-respects
+
+    # Nix development tools (personal only)
+    cachix
+    deadnix
+    nixd
+    nixfmt
+    nix-tree
+    statix
 
     # Media tools (personal-specific)
     ffmpeg

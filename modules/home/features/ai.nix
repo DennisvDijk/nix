@@ -1,7 +1,7 @@
 # modules/home/features/ai.nix
 # AI/ML development tools and assistants
 
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, my, ... }:
 
 let
   inherit (lib) mkEnableOption mkIf mkMerge;
@@ -22,7 +22,8 @@ in
         # AI coding assistants from Nix (not Homebrew!)
         # claude-code         # Claude Code CLI - temporarily disabled due to npm registry connection issues
         codex               # OpenAI Codex CLI
-        gemini-cli          # Google Gemini CLI
+        # Gemini CLI remains for work Enterprise; personal moved to Antigravity.
+        (if my.isPersonal then antigravity-cli else gemini-cli)
         
         # OpenCode (your own tool!)
         # Note: If it's in your custom tap, better to use Nix directly

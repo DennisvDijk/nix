@@ -1,7 +1,7 @@
 # hosts/personal/darwin.nix
 # Personal host Darwin configuration using feature flags
 
-{ config, pkgs, lib, username, inputs, ... }:
+{ pkgs, lib, inputs, ... }:
 
 {
   imports = [
@@ -54,54 +54,100 @@
     };
   };
 
-  # Personal-specific Homebrew casks
+  # Personal-specific Homebrew casks (synced from `brew list --cask`)
   homebrew.casks = lib.mkAfter [
     # Browsers
     "arc"
     "orion"
     "brave-browser"
+    "zen"
 
     # Communication
     "signal"
     "whatsapp"
     "telegram-desktop"
+    "discord"
 
     # Media
     "spotify"
     "vlc"
 
-    # Development
+    # Development / AI
     "wave"
+    "block-goose"
+    "claude-code"
+    "codex"
+    "grok-bot"
+    "openhuman"
+    "claude"
+    "chatgpt"
+    "handy"
+    "ollama-app"
+    "llama-app"
+    "lm-studio"
+    "typewhisper/tap/typewhisper"
 
     # Productivity
     "obsidian"
+    "emdash"
+    "cmux"
 
-    # AI/ML
-    "handy"
-    "ollama-app"
-    "lm-studio"
-    "llamabarn"
-    "claude"
-    "typewhisper/tap/typewhisper"
-
-    # Window manager
+    # Window management
     "nikitabobko/tap/aerospace"
+    "jordanbaird-ice"
 
     # Utilities
+    "balenaetcher"
     "thaw"
     "tailscale-app"
     "parsec"
+    "warp"
+    "fcjr/fcjr/ventoy2disk"
 
-    # Gaming/Fun
+    # Gaming / creative
     "steam"
     "blender"
-    "discord"
-    "chatgpt"
-    "emdash"
-    "cmux"
+  ];
+
+  # Personal CLI tools installed directly with Homebrew.
+  # ffmpeg, mosh, and nmap are omitted: Home Manager already provides them through Nix.
+  homebrew.brews = lib.mkAfter [
+    "cargo-audit"
+    "cargo-deny"
+    "cargo-outdated"
+    "cargo-sort"
+    "git-cliff"
+    "herdr"
+    "hf"
+    "1broseidon/tap/ketch"
+    "libiconv"
+    "llmfit"
+    "pi-coding-agent"
+    "rjyo/moshi/moshi-hook"
+    "sox"
+    "taplo"
+    "typos-cli"
+    "watch"
+    "whisper.cpp"
   ];
 
   homebrew.taps = lib.mkAfter [
+    {
+      name = "1broseidon/tap";
+      clone_target = "https://github.com/1broseidon/homebrew-tap";
+    }
+    {
+      name = "fcjr/fcjr";
+      clone_target = "https://github.com/fcjr/homebrew-fcjr";
+    }
+    {
+      name = "nikitabobko/tap";
+      clone_target = "https://github.com/nikitabobko/homebrew-tap";
+    }
+    {
+      name = "rjyo/moshi";
+      clone_target = "https://github.com/rjyo/homebrew-moshi";
+    }
     {
       name = "typewhisper/tap";
       clone_target = "https://github.com/typewhisper/homebrew-tap";

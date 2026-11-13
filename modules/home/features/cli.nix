@@ -86,9 +86,11 @@ in
       ]))
       
       (mkIf cfg.systemTools.enable (with pkgs; [
-        # System monitoring
+        # Cross-platform system monitoring
         fastfetch
-        htop              # Fallback to bottom
+        htop
+      ] ++ lib.optionals stdenv.hostPlatform.isLinux [
+        # Linux-only process/network monitors
         iotop
         nethogs
       ]))
