@@ -1,7 +1,7 @@
 # modules/darwin/features/default.nix
 # Darwin-specific feature modules
 
-{ config, pkgs, lib, ... }:
+{ ... }:
 
 {
   imports = [
@@ -9,7 +9,7 @@
     ./homebrew.nix
     ./omlx-app.nix
   ];
-  
+
   # Darwin-specific options namespace
   options.my.darwin = {
     # Individual features defined in their modules

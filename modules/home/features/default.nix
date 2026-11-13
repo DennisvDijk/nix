@@ -1,7 +1,7 @@
 # modules/home/features/default.nix
 # All feature modules imported together
 
-{ config, pkgs, lib, ... }:
+{ lib, ... }:
 
 {
   imports = [
@@ -17,13 +17,13 @@
     ./devtools.nix
     ../../shared/ui/fonts.nix
   ];
-  
+
   # Global feature options
   options.my.features = {
     # Individual features are defined in their respective modules
     # This is just to ensure the namespace exists
   };
-  
+
   # Default: enable common features
   config.my.features = {
     shell.enable = lib.mkDefault true;

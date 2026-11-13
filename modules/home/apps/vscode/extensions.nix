@@ -1,6 +1,9 @@
-{ pkgs, ...}:
+# Not imported by any host. Kept so this extension list is not deleted.
+# Wire it into programs.vscode.extensions from a home.nix to use it.
+{ pkgs, ... }:
 
-with pkgs.vscode-extensions; [
+with pkgs.vscode-extensions;
+[
   eamodio.gitlens
   esbenp.prettier-vscode
   usernamehw.errorlens
@@ -12,5 +15,3 @@ with pkgs.vscode-extensions; [
   ms-vscode.cpptools
   ms-kubernetes-tools.vscode-kubernetes-tools
 ]
-
-

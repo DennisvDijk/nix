@@ -1,7 +1,7 @@
-# ./modules/orion.nix
+# Not imported by any host. Kept so the Orion defaults are not deleted.
+# Import this file from a home.nix to apply them.
 #
-# This file contains all the configuration for the Orion Browser.
-# It is imported by your main home.nix file.
+# Orion Browser defaults. Not imported by any host today.
 
 { pkgs, lib, ... }:
 
@@ -10,11 +10,13 @@ let
   #
   # FIXED: Replaced the unavailable `gnustep-base` package with a direct
   # call to the system's `defaults` command, which is standard on macOS.
-  writeSetting = key: type: value:
+  writeSetting =
+    key: type: value:
     "${pkgs.coreutils}/bin/echo 'Writing Orion setting: ${key}' && /usr/bin/defaults write com.kagi.Orion ${key} -${type} '${toString value}'";
 
   # Helper for writing hotkeys, also updated to use the system's `defaults`.
-  writeHotkey = title: keybind:
+  writeHotkey =
+    title: keybind:
     "/usr/bin/defaults write com.kagi.Orion CustomKeyEquivalents -dict-add '${title}' '${keybind}'";
 
 in

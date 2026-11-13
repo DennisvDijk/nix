@@ -3,100 +3,37 @@
 # Inherits pi setup (opencode, pi-coding-agent) and personal dotfiles.
 # No AI/LLM tools, no comms, no media apps.
 
-{ config, pkgs, lib, inputs, username, hostName, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
-  imports = [
-    ../../modules/shared/home-manager.nix    # Base config (core packages)
-    ../../modules/home/features              # Feature system
-  ];
+  imports = [ ../../modules/home/common.nix ];
 
-  # Host identification
-  home.username = username;
-  home.homeDirectory = "/Users/${username}";
-
-  # Enable Home Manager
-  programs.home-manager.enable = true;
-
-  # Nix binary cache for faster builds
-  nix.settings.substituters = [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
-  nix.settings.trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
-
-  # Feature flags — lean for headless server
+  # Same personal identity and dotfiles. No AI stack, no opencode-tools.
   my.features = {
-    # Shell — managed by chezmoi (same personal dotfiles)
     shell = {
-      enable = true;
-      starship.enable = false;   # chezmoi manages ~/.zshrc + starship
-      direnv.enable  = true;
-      zoxide.enable  = true;
-      atuin.enable   = false;
+      starship.enable = false;
+      atuin.enable = false;
     };
-
-    cli.enable = true;
 
     git = {
-      enable = true;
       userName = "Dennis van Dijk";
       userEmail = "dennis@thenextgen.nl";
-      delta.enable    = true;
-      lazygit.enable  = true;
-      jujutsu.enable  = true;
-      githubCli.enable  = true;
-      gitlabCli.enable  = false;
     };
 
-    terminal = {
-      enable = true;
-      wezterm.enable  = true;
-      alacritty.enable = true;
-      kitty.enable    = false;
-      iterm2.enable   = true;
-    };
+    nh.defaultDarwinHost = "mac-mini";
 
-    nh = {
-      enable = true;
-      flakeDir = "${config.home.homeDirectory}/.config/nix";
-      defaultDarwinHost = "mac-mini";
-    };
-
-    dev = {
-      enable = true;
-      docker.enable  = true;   # Orbstack + docker CLI
-      node.enable    = true;
-      python.enable  = true;
-      http.enable    = true;
-    };
+    dev.enable = true;
 
     k8s = {
       enable = true;
-      kubectl.enable  = true;
-      k9s.enable      = true;
-      helm.enable     = false;  # Not needed on home server
+      helm.enable = false;
       operators.enable = false;
-      cloud.enable    = false;
     };
-
-    # No AI/LLM tools — this is a server, not a dev workstation
-    ai.enable = false;
-
-    # No self-hosted opencode-tools stack on the Mini
-    devtools.enable = false;
-  };
-
-  # chezmoi owns ~/.zshrc — disable home-manager's zsh file generation
-  programs.zsh.enable = lib.mkForce false;
-
-  # User identity
-  my.user = {
-    fullName = "Dennis van Dijk";
-    firstName = "Dennis";
-    lastName = "van Dijk";
-    email.personal = "dennis@thenextgen.nl";
-    email.git      = "dennis@thenextgen.nl";
-    email.work     = "";
-    username       = username;
-    homeDirectory  = "/Users/${username}";
   };
 
   # ── Dotfiles ────────────────────────────────────────────────────

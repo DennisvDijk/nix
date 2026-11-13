@@ -1,0 +1,4 @@
+# NixOS modules merge a key that is assigned more than once
+# (`programs.zsh = …; programs.git = …;`). Collapsing those hides the
+# `mkIf` around each program, so repeated_keys is not useful here.
+disabled = [ "repeated_keys" ]

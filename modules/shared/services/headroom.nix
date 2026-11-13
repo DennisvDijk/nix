@@ -8,10 +8,21 @@
 # Requires headroom-ai installed via:  uv tool install "headroom-ai[all]"
 # Binary lives at ~/.local/bin/headroom (added to PATH by .zshrc)
 
-{ config, pkgs, lib, username, ... }:
+{
+  config,
+  lib,
+  username,
+  ...
+}:
 
 let
-  inherit (lib) mkEnableOption mkIf mkOption types optionalString;
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    optionalString
+    ;
   cfg = config.my.services.headroom;
 
   home = config.users.users.${username}.home or "/Users/${username}";
@@ -20,7 +31,9 @@ let
 in
 {
   options.my.services.headroom = {
-    enable = mkEnableOption "Headroom context compression proxy" // { default = false; };
+    enable = mkEnableOption "Headroom context compression proxy" // {
+      default = false;
+    };
 
     port = mkOption {
       type = types.int;

@@ -1,7 +1,12 @@
 # modules/home/features/shell.nix
 # Shell environment with zsh, starship, direnv, zoxide
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   inherit (lib) mkEnableOption mkIf;
@@ -10,12 +15,20 @@ in
 {
   options.my.features.shell = {
     enable = mkEnableOption "shell environment (zsh, starship, direnv, zoxide)";
-    
+
     # Sub-options for fine-grained control
-    starship.enable = mkEnableOption "starship prompt" // { default = true; };
-    direnv.enable = mkEnableOption "direnv with nix-direnv" // { default = true; };
-    zoxide.enable = mkEnableOption "zoxide smart cd" // { default = true; };
-    atuin.enable = mkEnableOption "atuin shell history" // { default = true; };
+    starship.enable = mkEnableOption "starship prompt" // {
+      default = true;
+    };
+    direnv.enable = mkEnableOption "direnv with nix-direnv" // {
+      default = true;
+    };
+    zoxide.enable = mkEnableOption "zoxide smart cd" // {
+      default = true;
+    };
+    atuin.enable = mkEnableOption "atuin shell history" // {
+      default = true;
+    };
   };
 
   config = mkIf cfg.enable {

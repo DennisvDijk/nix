@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   omlx-app = pkgs.stdenv.mkDerivation rec {
@@ -6,7 +11,7 @@ let
     version = "0.4.4";
 
     src = pkgs.fetchurl {
-      url = "https://github.com/jundot/omlx/releases/download/v0.4.4";
+      url = "https://github.com/jundot/omlx/releases/download/v${version}";
       sha256 = "1v9zkkvw02w8b6pfv0dfv9nj97cizr39p9q5xq75v9gk6br82fxh";
     };
 

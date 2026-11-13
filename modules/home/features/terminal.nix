@@ -1,7 +1,12 @@
 # modules/home/features/terminal.nix
 # Terminal emulators configuration
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   inherit (lib) mkEnableOption mkIf;
@@ -10,11 +15,19 @@ in
 {
   options.my.features.terminal = {
     enable = mkEnableOption "terminal emulators";
-    
-    wezterm.enable = mkEnableOption "WezTerm" // { default = true; };
-    alacritty.enable = mkEnableOption "Alacritty" // { default = true; };
-    kitty.enable = mkEnableOption "Kitty" // { default = false; };
-    iterm2.enable = mkEnableOption "iTerm2 (via Homebrew)" // { default = true; };
+
+    wezterm.enable = mkEnableOption "WezTerm" // {
+      default = true;
+    };
+    alacritty.enable = mkEnableOption "Alacritty" // {
+      default = true;
+    };
+    kitty.enable = mkEnableOption "Kitty" // {
+      default = false;
+    };
+    iterm2.enable = mkEnableOption "iTerm2 (via Homebrew)" // {
+      default = true;
+    };
   };
 
   config = mkIf cfg.enable {
@@ -60,7 +73,6 @@ in
         }
       '';
     };
-
 
     # Alacritty - installed via Nix
     programs.alacritty = mkIf cfg.alacritty.enable {
@@ -130,7 +142,9 @@ in
         name = "JetBrainsMono Nerd Font";
         size = 13;
       };
-      theme = "Catppuccin-Mocha";
+      # `programs.kitty.theme` was removed. themeFile is the current option.
+      # Kitty stays off on every host, so this does not change the generation.
+      themeFile = "Catppuccin-Mocha";
       settings = {
         confirm_os_window_close = 0;
         enable_audio_bell = false;
@@ -147,11 +161,11 @@ in
     # Terminal-related packages from Nix
     home.packages = with pkgs; [
       # Terminal multiplexer
-      zellij              # Modern tmux alternative in Rust
+      zellij # Modern tmux alternative in Rust
       # tmux              # Uncomment if preferred
-      
+
       # Terminal utilities
-      reattach-to-user-namespace  # For tmux on macOS
+      reattach-to-user-namespace # For tmux on macOS
     ];
   };
 }

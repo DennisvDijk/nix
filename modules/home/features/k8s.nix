@@ -1,7 +1,12 @@
 # modules/home/features/k8s.nix
 # Kubernetes and cloud-native tooling
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   inherit (lib) mkEnableOption mkIf mkMerge;
@@ -10,64 +15,89 @@ in
 {
   options.my.features.k8s = {
     enable = mkEnableOption "Kubernetes and cloud-native tools";
-    
-    kubectl.enable = mkEnableOption "kubectl" // { default = true; };
-    k9s.enable = mkEnableOption "k9s TUI" // { default = true; };
-    helm.enable = mkEnableOption "Helm package manager" // { default = true; };
-    operators.enable = mkEnableOption "Kubernetes operators" // { default = true; };
-    cloud.enable = mkEnableOption "Cloud CLIs (AWS, GCP, Azure)" // { default = false; };
+
+    kubectl.enable = mkEnableOption "kubectl" // {
+      default = true;
+    };
+    k9s.enable = mkEnableOption "k9s TUI" // {
+      default = true;
+    };
+    helm.enable = mkEnableOption "Helm package manager" // {
+      default = true;
+    };
+    operators.enable = mkEnableOption "Kubernetes operators" // {
+      default = true;
+    };
+    cloud.enable = mkEnableOption "Cloud CLIs (AWS, GCP, Azure)" // {
+      default = false;
+    };
   };
 
   config = mkIf cfg.enable {
     home.packages = mkMerge [
-      (mkIf cfg.kubectl.enable (with pkgs; [
-        kubectl
-        kubectx             # Context and namespace switching (includes kubens)
-        stern               # Multi-pod log tailing
-        
-        # Kubernetes utilities
-        kubectl-tree        # Tree view of resources
-        kubectl-neat        # Clean up YAML
-        kubectl-cnpg        # CloudNativePG plugin
-        
-        # Alternative tools
-        k3d                 # k3s in Docker
-        kind                # Kubernetes in Docker
-      ]))
-      
-      (mkIf cfg.k9s.enable (with pkgs; [
-        k9s                 # Kubernetes TUI
-      ]))
-      
-      (mkIf cfg.helm.enable (with pkgs; [
-        kubernetes-helm
-        helmfile            # Declarative Helm deployments
-      ]))
-      
-      (mkIf cfg.operators.enable (with pkgs; [
-        # Operators and controllers
-        operator-sdk
-        kustomize           # Kubernetes native config management
-        
-        # GitOps
-        fluxcd              # GitOps toolkit
-        argocd              # ArgoCD CLI
-      ]))
-      
-      (mkIf cfg.cloud.enable (with pkgs; [
-        # Cloud CLIs
-        awscli2
-        google-cloud-sdk
-        azure-cli
-        
-        # Cloud tools
-        s3cmd
-        s5cmd               # Faster S3 operations
-        
-        # Secrets
-        sops
-        age
-      ]))
+      (mkIf cfg.kubectl.enable (
+        with pkgs;
+        [
+          kubectl
+          kubectx # Context and namespace switching (includes kubens)
+          stern # Multi-pod log tailing
+
+          # Kubernetes utilities
+          kubectl-tree # Tree view of resources
+          kubectl-neat # Clean up YAML
+          kubectl-cnpg # CloudNativePG plugin
+
+          # Alternative tools
+          k3d # k3s in Docker
+          kind # Kubernetes in Docker
+        ]
+      ))
+
+      (mkIf cfg.k9s.enable (
+        with pkgs;
+        [
+          k9s # Kubernetes TUI
+        ]
+      ))
+
+      (mkIf cfg.helm.enable (
+        with pkgs;
+        [
+          kubernetes-helm
+          helmfile # Declarative Helm deployments
+        ]
+      ))
+
+      (mkIf cfg.operators.enable (
+        with pkgs;
+        [
+          # Operators and controllers
+          operator-sdk
+          kustomize # Kubernetes native config management
+
+          # GitOps
+          fluxcd # GitOps toolkit
+          argocd # ArgoCD CLI
+        ]
+      ))
+
+      (mkIf cfg.cloud.enable (
+        with pkgs;
+        [
+          # Cloud CLIs
+          awscli2
+          google-cloud-sdk
+          azure-cli
+
+          # Cloud tools
+          s3cmd
+          s5cmd # Faster S3 operations
+
+          # Secrets
+          sops
+          age
+        ]
+      ))
     ];
 
     # Kubernetes shell integration
@@ -83,7 +113,7 @@ in
         alias kx='kubectx'
         alias kn='kubens'
       fi
-      
+
       # k9s config directory
       export K9S_CONFIG_DIR="$HOME/.config/k9s"
     '';
