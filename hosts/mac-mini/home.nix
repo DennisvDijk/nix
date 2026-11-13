@@ -61,5 +61,6 @@ in
   home.file = {
     ".zshrc" = link "hosts/mac-mini/dotfiles/zshrc";
     ".pi/agent/settings.json" = link "hosts/mac-mini/dotfiles/pi/agent/settings.json";
+    ".pi/agent/AGENTS.md" = link "hosts/mac-mini/dotfiles/pi/agent/AGENTS.md";
   };
 }

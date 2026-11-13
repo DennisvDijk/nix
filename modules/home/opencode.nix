@@ -1,14 +1,14 @@
-# OpenCode CLI 1.19.5, the current GitHub release.
-# The locked nixpkgs copy is 1.1.47, which is behind that release.
+# OpenCode CLI 2.3.0, the current v2 GitHub release.
+# GitHub's "latest" release is still v1.19.5. The locked nixpkgs copy is 1.1.47.
 # Official Apple Silicon zip. This Linux runner cannot execute the binary.
 { pkgs }:
 pkgs.stdenvNoCC.mkDerivation rec {
   pname = "opencode";
-  version = "1.19.5";
+  version = "2.3.0";
 
   src = pkgs.fetchurl {
     url = "https://github.com/anomalyco/opencode/releases/download/v${version}/opencode-darwin-arm64.zip";
-    hash = "sha256-wcnmJSEZIZLvTD7RNVraIUQFW922FoIhfpl7A8VSA8E=";
+    hash = "sha256-eQffKxJyCoQPu0nFuXi5uCkltr91R5pf0havqJMrZwI=";
   };
 
   nativeBuildInputs = [ pkgs.unzip ];
