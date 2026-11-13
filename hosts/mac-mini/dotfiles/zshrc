@@ -1,0 +1,14 @@
+# Mac mini shell. Symlinked from the nix checkout, so edits apply without a rebuild.
+export PATH="$HOME/.nix-profile/bin:/run/current-system/sw/bin:$PATH"
+export EDITOR="vi"
+export MINI_ENV=1
+
+# Colima's socket. The daemon is a LaunchDaemon, so this is up after boot.
+export DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"
+
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
+# Reattach to the pi session after an SSH drop.
+alias pi-up='tmux new-session -A -s pi pi'

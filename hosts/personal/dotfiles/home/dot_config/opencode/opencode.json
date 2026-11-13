@@ -1,0 +1,474 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "ai-gateway/claude-sonnet-4.6-bedrock",
+  "agents": {
+    "title": {
+      "model": "ai-gateway/gpt-5.4-mini"
+    }
+  },
+  "providers": {
+    "ai-gateway": {
+      "name": "Enexis AI Gateway",
+      "package": "aisdk:@ai-sdk/openai-compatible",
+      "settings": {
+        "baseURL": "{env:ENEXIS_AI_GATEWAY_URL}",
+        "apiKey": "{env:ENEXIS_AI_GATEWAY_KEY}",
+        "timeout": 300000
+      },
+      "models": {
+        "claude-sonnet-4.6-bedrock": {
+          "name": "claude-sonnet-4.6"
+        },
+        "claude-haiku-4.5-bedrock": {
+          "name": "claude-haiku-4.5"
+        },
+        "claude-opus-4.8-bedrock": {
+          "name": "claude-opus-4.8"
+        },
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        },
+        "gpt-5.4-mini": {
+          "name": "gpt-5.4-mini"
+        }
+      }
+    },
+    "opencode-go": {},
+    "copilot": {},
+    "omlx": {
+      "name": "oMLX local",
+      "package": "aisdk:@ai-sdk/openai-compatible",
+      "settings": {
+        "baseURL": "http://127.0.0.1:8000/v1",
+        "timeout": 300000
+      },
+      "models": {
+        "qwen3.6-35B-A3B-4bit": {
+          "name": "Qwen3.6-35B-A3B",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+        "qwen3.6-27b-4bit": {
+          "name": "qwen3.6-27b-4bit"
+        }
+      }
+    }
+  },
+  "policies": [
+    {
+      "action": "provider.use",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "ai-gateway",
+      "effect": "allow"
+    },
+    {
+      "action": "provider.use",
+      "resource": "opencode-go",
+      "effect": "allow"
+    },
+    {
+      "action": "provider.use",
+      "resource": "copilot",
+      "effect": "allow"
+    },
+    {
+      "action": "provider.use",
+      "resource": "omlx",
+      "effect": "allow"
+    },
+    {
+      "action": "provider.use",
+      "resource": "anthropic",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "openai",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "google",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "xai",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "amazon-bedrock",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "azure",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "openrouter",
+      "effect": "deny"
+    }
+  ],
+  "permissions": [
+    {
+      "action": "skill",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "subagent",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "websearch",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.config/opencode/*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "git status",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git status *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git diff",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git diff *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git log *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git show *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git add *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git commit *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git fetch *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git stash list",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "python *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "uv *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pytest *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "ruff *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "mypy *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "node *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "npm test",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "npm run *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "terraform fmt",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "terraform validate",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "terraform plan *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "tofu plan *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "helm lint *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "helm template *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "helm diff *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl get *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl describe *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl logs *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl diff *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "aws sts get-caller-identity",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "aws s3 ls *",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl apply *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "helm upgrade *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "helm install *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "terraform apply *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "pip install *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "npm install *",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "sudo *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "rm -rf *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl delete *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "terraform destroy *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "helm uninstall *",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "aws iam delete-*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "*.env",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": "*.env.*",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": ".env",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": "**/.env",
+      "effect": "ask"
+    },
+    {
+      "action": "read",
+      "resource": "*.pem",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*.key",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "**/secrets*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "**/*credential*",
+      "effect": "deny"
+    },
+    {
+      "action": "edit",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "edit",
+      "resource": "*",
+      "effect": "ask"
+    }
+  ],
+  "mcp": {
+    "servers": {
+      "mem0": {
+        "type": "local",
+        "command": [
+          "python",
+          "-m",
+          "mem0_mcp.server"
+        ],
+        "environment": {
+          "MEM0_API_URL": "{env:MEM0_API_URL}"
+        }
+      },
+      "headroom": {
+        "type": "local",
+        "command": [
+          "headroom",
+          "mcp",
+          "serve"
+        ],
+        "environment": {
+          "HEADROOM_OUTPUT_SHAPER": "1",
+          "HEADROOM_CACHE_ALIGN": "1",
+          "HEADROOM_LOG_LEVEL": "warn"
+        }
+      },
+      "gitlab": {
+        "type": "local",
+        "command": [
+          "npx",
+          "@modelcontextprotocol/server-gitlab"
+        ],
+        "environment": {
+          "GITLAB_TOKEN": "{env:GITLAB_TOKEN}",
+          "GITLAB_URL": "{env:GITLAB_URL}"
+        }
+      },
+      "searxng": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "mcp-searxng"
+        ],
+        "disabled": true,
+        "environment": {
+          "SEARXNG_URL": "http://localhost:8080"
+        }
+      }
+    }
+  }
+}

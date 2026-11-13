@@ -1,59 +1,26 @@
 # hosts/work/darwin.nix
 # Work host Darwin configuration — Enexis AI Platform
 
-{ config, pkgs, lib, username, inputs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  username,
+  inputs,
+  ...
+}:
 
 {
   imports = [
-    ../../modules/darwin/features
+    ../../modules/darwin/common.nix
     inputs.mac-app-util.darwinModules.default
-    # No sketchybar — that's a personal desktop tool
-    # Aerospace is installed via homebrew cask below; config managed by chezmoi
+    # No sketchybar — that's a personal desktop tool.
+    # Aerospace config is ~/.aerospace.toml, a Home Manager symlink.
   ];
 
-  # Host identification
-  networking.hostName = "work";
-  system.stateVersion = 6;
-
-  # Primary user
-  system.primaryUser = username;
-
-  users.users.${username} = {
-    home = "/Users/${username}";
-    shell = pkgs.zsh;
-  };
-
-  # Nix configuration — Determinate Nix (same as personal MacBook)
-  nix.enable = false;
-
-  # Binary cache for faster builds
-  nix.settings.substituters = [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
-  nix.settings.trusted-public-keys = [
-    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-  ];
-
-  # Darwin feature flags
-  my.darwin = {
-    defaults = {
-      enable = true;
-      keyboard.enable = true;
-      dock.enable = true;
-      finder.enable = true;
-      trackpad.enable = true;
-      menuBar.enable = true;
-    };
-
-    homebrew = {
-      enable = true;
-      nixHomebrew.enable = false;
-      autoUpdate = true;
-      cleanup = false;
-      casks.enable = true;
-      brews.enable = true;
-      mas.enable = false;
-    };
-  };
+  my.darwin.homebrew.brews.enable = true;
+  # The OpenCode CLI is the Nix package from the agent stack. The desktop cask stays.
+  my.darwin.homebrew.opencodeCli.enable = false;
 
   # Work-specific Homebrew casks
   # NOTE: awscli2 + azure-cli are installed via Nix (k8s.cloud.enable) — not via brew
@@ -153,18 +120,15 @@
   # Environment variables
   environment.variables = {
     WORK_ENV = lib.mkForce "1";
-    AWS_DEFAULT_REGION = "eu-west-1";    # Data residency: EU only
+    AWS_DEFAULT_REGION = "eu-west-1"; # Data residency: EU only
     AWS_REGION = "eu-west-1";
   };
 
-  # System packages from Nix (minimal — most are in Home Manager)
-  environment.systemPackages = with pkgs; [
-    home-manager
-    git
-  ];
-
   # Keep Finicky as the managed HTTPS entry point. Run after Homebrew so a
   # newly installed Finicky app can become the handler in the same switch.
+  # postActivation is one of the script names nix-darwin actually runs.
+  # Finicky and the Radar check both belong here. checkRadarUpdate was a
+  # custom name, so the Radar check never ran.
   system.activationScripts.postActivation.text = lib.mkAfter ''
     if [ -x "${pkgs.duti}/bin/duti" ] && [ -d "/Applications/Finicky.app" ]; then
       echo "Setting Finicky as the default HTTPS handler..."
@@ -172,22 +136,22 @@
     else
       echo "Finicky is not installed yet; skipping default HTTPS handler setup."
     fi
+
+    # --check is read-only. Run as the user so Homebrew sees their cellar.
+    if sudo -u ${username} -H /opt/homebrew/bin/brew list radar >/dev/null 2>&1; then
+      echo "Checking Skyhook Radar for updates..."
+      sudo -u ${username} -H "/Users/${username}/.config/nix/bin/update-radar.sh" --check \
+        && echo "  Radar is up to date." \
+        || echo "  Run ~/.config/nix/bin/update-radar.sh to review and apply the update."
+    fi
   '';
 
-  # Auto-check Radar updates on every darwin-rebuild switch
-  # Runs in --check (non-interactive) mode; prompts you to run update-radar.sh manually if an update is found
-  system.activationScripts.checkRadarUpdate = {
-    text = ''
-      if command -v brew &>/dev/null && brew list radar &>/dev/null 2>&1; then
-        echo "Checking Skyhook Radar for updates..."
-        "$HOME/.config/nix/bin/update-radar.sh" --check \
-          && echo "  Radar is up to date." \
-          || echo "  Run ~/.config/nix/bin/update-radar.sh to review and apply the update."
-      fi
-    '';
-  };
-
   # Daily background check — pops a macOS notification if an update is available
+  environment.systemPackages = with pkgs; [
+    home-manager
+    git
+  ];
+
   launchd.user.agents.radarUpdateCheck = {
     serviceConfig = {
       Label = "io.skyhook.radar-update-check";
@@ -201,7 +165,12 @@
           fi
         ''
       ];
-      StartCalendarInterval = [{ Hour = 9; Minute = 0; }];  # Daily at 09:00
+      StartCalendarInterval = [
+        {
+          Hour = 9;
+          Minute = 0;
+        }
+      ]; # Daily at 09:00
       StandardOutPath = "/tmp/radar-update-check.log";
       StandardErrorPath = "/tmp/radar-update-check.log";
     };

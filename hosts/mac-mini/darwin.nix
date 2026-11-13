@@ -1,127 +1,102 @@
-# hosts/mac-mini/darwin.nix
-# Mac Mini — headless home server
-# Runs Hermes (docker/media stack), pi-coding-agent, opencode
-# Uses personal chezmoi dotfiles (same identity as personal host)
-
-{ config, pkgs, lib, username, inputs, ... }:
-
+# Headless Mac mini: Colima (Docker for Hermes) and the Pi coding agent.
+# No Homebrew, no GUI apps, no window manager.
+{ pkgs, username, ... }:
+let
+  pi = import ./pi.nix { inherit pkgs; };
+in
 {
-  imports = [
-    ../../modules/darwin/features                # defaults + homebrew
-    ../../modules/shared/services/aerospace.nix  # for occasional display use
-    ../../modules/shared/services/headroom.nix   # pi setup: context compression proxy
-    inputs.mac-app-util.darwinModules.default
-    # NOTE: sketchybar intentionally excluded — this is headless-first
-  ];
-
-  # Host identification
   networking.hostName = "mac-mini";
   system.stateVersion = 6;
+  system.primaryUser = username;
 
-  # Primary user — same identity as personal MacBook
-  system.primaryUser = "dennisvandijk";
-
-  users.users.dennisvandijk = {
-    home = "/Users/dennisvandijk";
+  users.users.${username} = {
+    home = "/Users/${username}";
     shell = pkgs.zsh;
   };
 
-  # Nix — Determinate Nix (same as MacBook, confirmed working)
+  # Determinate Nix, same as the laptops. GC is a LaunchDaemon below
+  # because nix.gc.automatic refuses to run when nix.enable is false.
   nix.enable = false;
-
-  # Binary cache for faster builds
-  nix.settings.substituters = [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
-  nix.settings.trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
-
-  # Darwin feature flags
-  my.darwin = {
-    defaults = {
-      enable = true;
-      keyboard.enable = true;
-      dock.enable = true;       # for occasional display use
-      finder.enable = true;
-      trackpad.enable = false;  # headless-first; no trackpad on Mac Mini
-      menuBar.enable = true;
-    };
-
-    homebrew = {
-      enable = true;
-      nixHomebrew.enable = false;
-      autoUpdate = true;
-      cleanup = false;
-      casks.enable = true;      # inherits base casks from homebrew.nix (vscode, orbstack, wezterm, raycast, etc.)
-      brews.enable = false;     # define our own lean brew list below
-      mas.enable = false;
-    };
+  nix.settings = {
+    substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
   };
 
-  # ── Homebrew — lean; only what the Mini needs ───────────────────
-  # Inherits base casks from modules/darwin/features/homebrew.nix:
-  #   chrome, firefox@nightly, vscode, iterm2, orbstack, wezterm, raycast, rectangle, stats
+  # Apple's sshd. This is a system daemon, so it is up after reboot
+  # without anyone logging into the GUI.
+  services.openssh.enable = true;
 
-  # Extra casks for the Mini
-  homebrew.casks = lib.mkAfter [
-    # Browsers
-    "arc"
+  # Tailscale's system daemon (tailscaled), not the Homebrew menu-bar app.
+  # nix-darwin starts it at boot with RunAtLoad. `tailscale up` is still
+  # a one-time login; overrideLocalDns stays off so macOS DNS is unchanged.
+  services.tailscale.enable = true;
 
-    # Container runtime (Hermes, media stack, dev tools)
-    # Orbstack comes from base casks already
+  power.sleep.computer = "never";
+  power.sleep.display = "never";
+  power.sleep.harddisk = "never";
+  power.restartAfterPowerFailure = true;
 
-    # Productivity (occasional GUI use)
-    "raycast"          # already in base casks; here for clarity
-
-    # Network / Security
-    "tailscale-app"
-    "bitwarden"
-
-    # Window management (for when a display is connected)
-    # aerospace from nikitabobko/tap
-    "nikitabobko/tap/aerospace"
-
-    # Fonts
-    "font-hack-nerd-font"
+  environment.systemPackages = [
+    pi
+    pkgs.colima
+    pkgs.lima
+    pkgs.docker-client
+    pkgs.git
+    pkgs.tmux
   ];
 
-  # Extra taps for the Mini
-  homebrew.taps = lib.mkAfter [
-    # OpenCode / pi-coding-agent
-    {
-      name = "anomalyco/tap";
-      clone_target = "https://github.com/anomalyco/homebrew-tap";
-    }
-    {
-      name = "typewhisper/tap";
-      clone_target = "https://github.com/typewhisper/homebrew-tap";
-    }
-  ];
-
-  # CLI tools — lean, just pi/opencode essentials
-  homebrew.brews = [
-    # Pi setup
-    "pi-coding-agent"
-
-    # OpenCode setup (fully-qualified tap name so Homebrew finds the formula)
-    "anomalyco/tap/opencode"
-  ];
-
-  # ── Headroom — context compression proxy for pi agents ──────────
-  my.services.headroom = {
-    enable = true;
-    port = 8787;
-    memory = true;
-    learn = true;
-    codeGraph = true;
-  };
-
-  # ── Environment ─────────────────────────────────────────────────
   environment.variables = {
-    MINI_ENV = lib.mkForce "1";
+    MINI_ENV = "1";
+    DOCKER_HOST = "unix:///Users/${username}/.colima/default/docker.sock";
   };
 
-  # System packages from Nix (minimal — most are in Home Manager)
-  environment.systemPackages = with pkgs; [
-    home-manager
-    git
-    duti
-  ];
+  # Colima is a Linux VM. On Apple Silicon it uses Virtualization.framework,
+  # so there is no Docker Desktop or OrbStack GUI to click.
+  # A LaunchDaemon with UserName starts at boot, before a GUI login.
+  # OrbStack and Docker Desktop only autostart inside a logged-in session.
+  launchd.daemons.colima = {
+    path = [
+      pkgs.colima
+      pkgs.lima
+      pkgs.coreutils
+    ];
+    script = ''
+      export HOME=/Users/${username}
+      exec colima start --foreground
+    '';
+    serviceConfig = {
+      UserName = username;
+      RunAtLoad = true;
+      KeepAlive = true;
+      ThrottleInterval = 30;
+      StandardOutPath = "/var/log/colima.log";
+      StandardErrorPath = "/var/log/colima.log";
+      EnvironmentVariables.HOME = "/Users/${username}";
+    };
+  };
+
+  launchd.daemons.nix-gc = {
+    script = ''
+      export PATH="/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:$PATH"
+      nix-collect-garbage --delete-older-than 14d
+      nix-store --optimise
+    '';
+    serviceConfig = {
+      RunAtLoad = false;
+      StartCalendarInterval = [
+        {
+          Hour = 3;
+          Minute = 15;
+        }
+      ];
+      StandardOutPath = "/var/log/nix-gc.log";
+      StandardErrorPath = "/var/log/nix-gc.log";
+    };
+  };
 }

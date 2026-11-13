@@ -1,7 +1,7 @@
 # Pi (lean)
 
 Packages: web-access, permissions, opencode-go-provider
-Default: opencode-go/kimi-k2.7-code
+Default: opencode-go/deepseek-v4-flash
 
 ```bash
 pi

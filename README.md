@@ -1,664 +1,112 @@
-# Nix Configuration Repository
+# nix-config
 
-This repository contains a comprehensive Nix-based configuration for macOS systems using Nix Darwin and Home Manager. The configuration follows modern Nix best practices and provides a declarative, reproducible system setup.
+nix-darwin and Home Manager for Dennis van Dijk's Macs. One flake, four hosts, all `aarch64-darwin`.
 
-## 🗂️ Repository Structure
+| Host | What it is | macOS user |
+| --- | --- | --- |
+| `personal` | Personal MacBook | `dennisvandijk` |
+| `work` | Work laptop (Enexis) | `Dennis.van.Dijk` |
+| `mac-mini` | Headless server: Colima and Pi. No GUI apps | `dennisvandijk` |
+| `template` | Starting point for another Mac | `dennisvandijk` |
 
-```
-.
-├── flake.nix                  # Main flake configuration
-├── flake.lock                 # Flake dependencies lock file
-├── hosts/                     # Host-specific configurations
-│   ├── personal/              # Personal machine config
-│   │   ├── darwin.nix         # Darwin system config
-│   │   └── home.nix           # Home Manager config
-│   └── work/                  # Work machine config
-│       ├── darwin.nix         # Darwin system config
-│       └── home.nix           # Home Manager config
-├── modules/                   # Reusable Nix modules
-│   ├── shared/                # Shared configuration modules
-│   │   ├── darwin.nix         # Shared Darwin configuration
-│   │   ├── home-manager.nix   # Shared Home Manager config
-│   │   ├── services/          # Service modules
-│   │   │   ├── aerospace.nix  # Aerospace window manager
-│   │   │   ├── sketchybar.nix # Sketchybar status bar
-│   │   │   └── wezterm.nix    # Wezterm terminal
-│   │   ├── programs/          # Program modules
-│   │   │   ├── chromium.nix   # Chromium browser config
-│   │   │   ├── starship.nix   # Starship prompt
-│   │   │   └── zsh.nix        # Zsh shell config
-│   │   └── ui/                # UI-related modules
-│   │       ├── fonts.nix      # Font configuration
-│   │       └── terminal.nix   # Terminal config
-│   └── home/                  # Home-specific modules
-│       ├── apps/              # Application configs
-│       │   ├── orion.nix      # Orion browser config
-│       │   └── vscode/        # VSCode configuration
-│       │       ├── extensions.nix
-│       │       └── settings.nix
-│       └── darwin/            # Darwin-specific home configs
-│           ├── casks.nix      # Homebrew casks list
-│           ├── default.nix    # Default config
-│           ├── packages.nix   # Package list
-│           └── home-manager.nix
-├── bin/                       # Utility scripts
-│   ├── add-package.sh        # Add packages helper
-│   ├── search_package.sh     # Package search tool
-│   └── update-homebrew.sh    # Homebrew sync tool
-├── config/                    # Configuration files
-│   ├── aerospace.toml        # Aerospace config
-│   ├── opencode/             # OpenCode configuration
-│   │   └── opencode.json     # OpenCode settings
-│   └── sketchybar/           # Sketchybar configuration
-│       ├── sketchybarrc      # Sketchybar main config
-│       └── workspace_update.sh # Workspace update script
-├── hosts/                    # Host configurations
-│   ├── personal/             # Personal host
-│   │   ├── darwin.nix        # Personal Darwin config
-│   │   └── home.nix          # Personal Home Manager config
-│   └── work/                 # Work host
-│       ├── darwin.nix        # Work Darwin config
-│       └── home.nix          # Work Home Manager config
-└── README.md                 # This file
-```
+Dotfiles for the laptops live in `hosts/<host>/dotfiles`. The mini has its own small tree at `hosts/mac-mini/dotfiles` (`~/.zshrc` and `~/.pi`). Home Manager symlinks them from the checkout at `my.flakePath` (default `~/.config/nix`), so they stay writable. Secrets are sops-encrypted in `secrets/`. Get Shit Done is not installed.
 
-## 🚀 Features
+The mini runs Colima as a LaunchDaemon (boot, as `dennisvandijk`, no GUI login) and Pi 1.5.2 from nix. Tailscale is nix-darwin's `services.tailscale` (`tailscaled` at boot), not the `tailscale-app` cask. After the first switch, run `sudo tailscale up` once (add `--ssh` if you want Tailscale SSH). `just mini-docker-status` and `just mini-pi` are meant to be run on that machine. SSH, never-sleep, restart after power failure, and a nightly `nix-collect-garbage` plus `nix-store --optimise` are part of the Darwin config. Nix GC is a LaunchDaemon because Determinate Nix keeps `nix.enable = false`, and nix-darwin will not install its own GC job in that case.
 
-### Core Configuration
-- **Nix Flakes** support with flake-utils integration
-- **Multi-host** configuration (personal and work setups)
-- **Modular architecture** for easy maintenance
-- **Darwin System** configuration with Nix Darwin
-- **Home Manager** for user environment management
+## Everyday commands
 
-### Window Management
-- **Aerospace** tiling window manager
-- **Sketchybar** status bar with workspace integration
-- Custom workspace indicators and app icons
-
-### Development Environment
-- **Zsh** with Oh My Zsh integration
-- **Starship** prompt with custom configuration
-- **Neovim**, **VSCode**, and other development tools
-- **Direnv** and **Nix-direnv** for environment management
-
-### Productivity Tools
-- **Raycast**, **Rectangle**, and other macOS utilities
-- **Alacritty** and **Wezterm** terminal emulators
-- **Brave Browser**, **Orion**, and other browsers
-- **Spotify**, **WhatsApp**, **Signal** for communication
-
-### AI & Development
-- **OpenCode** configuration with LM Studio integration
-- **Ollama**, **LM Studio**, and other AI tools
-- **Git**, **GitHub CLI**, and version control tools
-- **Docker**, **Podman**, and container tools
-
-## 📋 Usage
-
-### Initial Setup
+`just` is the front door. `nix develop` puts it on your PATH. With no arguments it lists every recipe. The host defaults to `$NIX_HOST`, then `personal`.
 
 ```bash
-# Clone this repository
-git clone https://github.com/yourusername/nix-config.git ~/.config/nix
-cd ~/.config/nix
-
-# Install Nix Darwin
-nix run nix-darwin -- switch --flake .#personal
-
-# Set up Home Manager
-home-manager switch --flake .#personal
+just                  # list recipes
+just personal         # darwin-rebuild, then home-manager, for that host
+just work
+just mac-mini         # switch the mini
+just mini-docker-status
+just mini-pi          # tmux session named pi; run on the mini
+just agent feat/auth  # wt switch --create, then cmux + pi (laptops)
+just agents           # wt list
+just agent-remove feat/auth
+just steer            # cmux paste --submit, from stdin
+just diff             # what a Darwin switch would change vs /run/current-system
+just diff-home work
+just gc               # nix-collect-garbage --delete-older-than 7d
+just rollback         # previous Darwin generation
+just rollback-home    # previous Home Manager generation
+just links            # check dotfile symlinks point at this checkout
+just update           # nix flake update
+just fmt              # nix fmt (nixfmt, RFC 166)
+just check            # deadnix + statix
 ```
 
-### Updating Configuration
+`just switch personal` and `just home personal` are the two halves of `just personal`. The same switch, home, update, fmt, and check commands exist as `nix run .#switch -- personal` and so on.
 
-```bash
-# Pull latest changes
-git pull
+## Layout
 
-# Rebuild Darwin system
-sudo darwin-rebuild switch --flake ~/.config/nix#personal
-
-# Update Home Manager
-home-manager switch --flake ~/.config/nix#personal
-
-# Full rebuild (both system and home)
-nix-full-rebuild
+```
+flake.nix                 inputs, formatter, checks, devshell, apps
+lib/hosts.nix             host registry (username + constructors)
+hosts/<name>/darwin.nix   what differs on that Mac
+hosts/<name>/home.nix     what differs for that user
+modules/darwin/common.nix user, caches, Homebrew cleanup
+modules/darwin/features/  macOS defaults, Homebrew baseline, oMLX
+modules/home/common.nix   Home Manager baseline for real hosts
+modules/home/features/    shell, cli, git, dev, k8s, ai, terminals, nh
+modules/shared/           packages every home gets, plus a few services
 ```
 
-### Adding Packages
+Host files set overrides only. Feature modules own the option definitions (`lib.mkEnableOption` / `lib.mkOption`) and the package lists. A flag left unset keeps its default.
 
-```bash
-# Search for packages
-./bin/search_package.sh package-name
+`modules/home/common.nix` is for machines that are in use. The template home config does not import it.
 
-# Add package to configuration
-./bin/add-package.sh package-name
-```
+## Add a host
 
-## 🎯 Configuration Philosophy
+1. Add a username in `lib/hosts.nix`.
+2. Copy `hosts/template/` to `hosts/<name>/`.
+3. Set `networking` overrides and `my.features` / Homebrew extras in the new files.
+4. `just switch <name>` and `just home <name>`.
 
-### Modular Design
-The configuration is organized into reusable modules:
-- **Services**: System services and daemons
-- **Programs**: Application configurations
-- **UI**: User interface and appearance settings
-- **Apps**: Application-specific configurations
+## Add a package
 
-### Host-Specific Customization
-- **Personal host**: Development and personal tools
-- **Work host**: Work-related applications and settings
-- **Shared configuration**: Common settings across all hosts
+- Every host: `modules/shared/home-manager.nix` (`home.packages`).
+- One feature (git, k8s, ai, …): the module in `modules/home/features/`.
+- One host: `home.packages` in `hosts/<name>/home.nix`, or `homebrew.casks` / `homebrew.brews` in `hosts/<name>/darwin.nix` for Mac apps.
+- A new toggle: add `lib.mkEnableOption` in a feature module and set it from the host.
 
-### Best Practices
-- **Declarative configuration**: Everything defined in Nix
-- **Reproducible environments**: Same configuration across machines
-- **Atomic updates**: Safe rollbacks and updates
-- **Minimal Homebrew usage**: Prefer Nix packages when available
+Search first: `./bin/search_package.sh <name>`.
 
-## 🔍 Workspace Distinction & Design Choices
+## Agent stack (personal and work)
 
-### Personal vs Work Workspaces
+`my.features.ai.agentStack.enable` installs Pi 1.5.2, OpenCode 2.3.0, and worktrunk (`wt`) from pins in this repo. The locked nixpkgs has neither current package (`opencode` there is 1.1.47). GitHub's latest release tag is still v1.19.5; 2.3.0 is the current v2 tag. cmux stays the Homebrew cask it already was. The mini does not get this option: tmux (`just mini-pi`) already keeps a Pi session across an SSH drop, and herdr would be a second multiplexer.
 
-The configuration distinguishes between two primary workspaces:
+Nix links the thin OpenCode file (`providers`, `permissions`, `mcp`, `$schema` `https://opencode.ai/config.json`) and, for Pi, `settings.json` plus `models.json`. A few hand-written files are linked too: the ketch extension, permission and optimizer configs, AGENTS/SETUP notes, personal `trust.json`, work `web-search.json`, the Headroom `.env.example`, `cli.json` (was `tui.json`), and the neon-singularity theme. Skills, the other themes, sessions, and caches stay out of the repo. Personal Pi stays `opencode-go/deepseek-v4-flash` with oMLX at `http://127.0.0.1:8000/v1`. Work Pi stays `ai-gateway/gpt-5.6-luna`. `npm:pi-worktrunk` is the only extra package in the laptop settings. The cmux hook is not vendored: `just agent-setup` runs `cmux hooks setup pi`, which writes it under `~/.pi`. `~/.config/worktrunk/config.toml` only sets `worktree-path`.
 
-#### Personal Workspace (`hosts/personal/`)
+One-time on each laptop, after `just home`:
 
-**Purpose**: Personal development, creative work, and general computing
+- `pi` downloads the packages listed in `settings.json`, including `pi-worktrunk`, on first launch.
+- macOS will ask for cmux's Automation permission the first time `just agent` opens a workspace.
+- `just agent-setup` re-runs `wt config shell install`, `wt config create`, and `cmux hooks setup pi` if you want the generators instead of the files in this repo. `wt config plugins pi install` is optional and not run.
 
-**Key Characteristics**:
-- Development-focused tooling (ffmpeg, imagemagick)
-- Personal productivity applications
-- Creative and multimedia tools
-- More permissive environment variables
+## Voice
 
-**Configuration Files**:
-- `hosts/personal/darwin.nix` - System-level personal config
-- `hosts/personal/home.nix` - User-level personal config
+TypeWhisper and Handy are both installed on the laptops. TypeWhisper is the dictation front-end. There is no checked-in TypeWhisper config: the app does not document a file this repo can own. On each Mac, once:
 
-**Environment**:
-```nix
-environment.variables.PERSONAL_ENV = "1";
-```
+1. System Settings → Privacy & Security → Microphone, and Accessibility, allow TypeWhisper.
+2. In TypeWhisper, pick the local Parakeet TDT v3 engine for English and Dutch. Leave WhisperKit available if you want streaming.
+3. Dictate into the focused cmux pane. That is the reliable way to talk to Pi.
+4. Do not point TypeWhisper at Headroom (`:8787`) until that API is confirmed.
 
-**Typical Use Case**:
-- Personal projects and open-source development
-- Multimedia editing and content creation
-- General computing and entertainment
+A voice-command router (dictate vs Mac command vs new agent) is not installed. TypeWhisper workflows can call a local model, but the workflow format was not verified here, so it is not declared. To steer the focused Pi pane from a script: `just steer`. To open a new task: `just agent <branch>`.
 
-#### Work Workspace (`hosts/work/`)
+Whether Handy is redundant next to TypeWhisper is an open question. Both stay installed.
 
-**Purpose**: Professional work, corporate development, and business applications
+## Notes that are easy to miss
 
-**Key Characteristics**:
-- Work-specific applications (Slack, Zoom, Microsoft Teams)
-- Corporate tooling and compliance
-- Work environment variables and settings
-- More restrictive configuration for security
-
-**Configuration Files**:
-- `hosts/work/darwin.nix` - System-level work config
-- `hosts/work/home.nix` - User-level work config
-
-**Environment**:
-```nix
-environment.variables.WORK_ENV = "1";
-environment.variables.COMPANY_DOMAIN = "work.example.com";
-```
-
-**Typical Use Case**:
-- Corporate development and proprietary projects
-- Business communications and meetings
-- Enterprise tooling and workflows
-
-### Shared Configuration Strategy
-
-**Rationale**: Maximize code reuse while allowing host-specific customization
-
-**Implementation**:
-```nix
-# In hosts/personal/darwin.nix
-environment.variables.PERSONAL_ENV = lib.mkForce "1";
-
-# In hosts/work/darwin.nix  
-environment.variables.WORK_ENV = lib.mkForce "1";
-```
-
-**Benefits**:
-- Single source of truth for common configuration
-- Easy to maintain and update shared settings
-- Clear separation of host-specific requirements
-- Reduced duplication and configuration drift
-
-### Design Choices Explained
-
-#### 1. **Modular Architecture**
-
-**Choice**: Split configuration into `services/`, `programs/`, `ui/` modules
-
-**Rationale**:
-- Improves maintainability and organization
-- Allows for selective imports and overrides
-- Makes it easier to find and update specific configurations
-- Reduces cognitive load when working with the config
-
-**Example**:
-```nix
-imports = [
-  ./services/sketchybar.nix
-  ./programs/starship.nix  
-  ./programs/zsh.nix
-  ./ui/fonts.nix
-];
-```
-
-#### 2. **Flake-Based Configuration**
-
-**Choice**: Use Nix flakes with flake-utils
-
-**Rationale**:
-- Better dependency management
-- Reproducible inputs with lock file
-- Support for multiple systems/architectures
-- Modern Nix best practice
-
-**Implementation**:
-```nix
-inputs.flake-utils.url = "github:numtide/flake-utils";
-
-outputs = { self, nixpkgs, nix-darwin, home-manager, flake-utils, ... }@inputs:
-  flake-utils.lib.eachDefaultSystem (system: { ... });
-```
-
-#### 3. **File Management with `mkStoreOutOfSymlink`**
-
-**Choice**: Use `lib.homeManager.mkStoreOutOfSymlink` for config files
-
-**Rationale**:
-- Allows applications to modify their own config files
-- Maintains proper file permissions
-- Creates symlinks instead of copying files
-- Better compatibility with GUI applications
-
-**Example**:
-```nix
-home.file.".config/sketchybar/sketchybarrc" = lib.homeManager.mkStoreOutOfSymlink {
-  source = ../../../config/sketchybar/sketchybarrc;
-  executable = true;
-};
-```
-
-#### 4. **Homebrew Integration**
-
-**Choice**: Keep some GUI apps in Homebrew while migrating others to Nix
-
-**Rationale**:
-- macOS GUI apps often work better as Homebrew casks
-- Some apps have auto-update mechanisms via Homebrew
-- Better integration with macOS services
-- Gradual migration path to reduce risk
-
-**Strategy**:
-```nix
-# Nix packages (preferred)
-environment.systemPackages = with pkgs; [
-  alacritty  # Migrated from Homebrew
-  sketchybar
-  wezterm
-];
-
-# Homebrew casks (GUI apps)
-homebrew.casks = [
-  "google-chrome"  # Better as cask
-  "spotify"        # Better as cask  
-  "rectangle"      # macOS-specific
-];
-```
-
-#### 5. **Environment Variables Strategy**
-
-**Choice**: Use `lib.mkForce` for environment variables
-
-**Rationale**:
-- Makes variable setting explicit and intentional
-- Prevents accidental overriding
-- Clear documentation of required variables
-- Better error handling
-
-**Example**:
-```nix
-environment.variables.PERSONAL_ENV = lib.mkForce "1";
-environment.variables.WORK_ENV = lib.mkForce "1";
-```
-
-#### 6. **Shell Integration**
-
-**Choice**: Comprehensive Zsh configuration with helper functions
-
-**Rationale**:
-- Provides convenient rebuild functions
-- Consistent shell experience across hosts
-- Integration with Oh My Zsh
-- Custom aliases and utilities
-
-**Example**:
-```nix
-initContent = ''
-  function nix-rebuild() {
-    local host=''${NIX_HOST:-personal}
-    echo "🔨 Rebuilding darwin system for host: $host"
-    sudo darwin-rebuild switch --flake ~/.config/nix#$host
-  }
-'';
-```
-
-#### 7. **Window Management**
-
-**Choice**: Aerospace + Sketchybar integration
-
-**Rationale**:
-- Aerospace provides tiling window management
-- Sketchybar provides status bar with workspace indicators
-- Tight integration between window manager and status bar
-- macOS-native feel with modern features
-
-**Implementation**:
-```nix
-# Aerospace configuration
-exec-on-workspace-change = ['/bin/bash', '-c',
-  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
-];
-
-# Sketchybar workspace integration
-script = "$SCRIPT_DIR/workspace_update.sh";
-```
-
-## 🎯 Workspace Selection & Usage
-
-### Choosing the Right Workspace
-
-**Personal Workspace**: Ideal for:
-- Personal development and open-source work
-- Creative projects and multimedia
-- General computing and entertainment
-- Development tooling and experimentation
-
-**Work Workspace**: Ideal for:
-- Corporate development and proprietary projects
-- Business communications and meetings
-- Enterprise tooling and workflows
-- Compliance and security requirements
-
-### Switching Between Workspaces
-
-```bash
-# Switch to personal workspace
-export NIX_HOST=personal
-nix-full-rebuild
-
-# Switch to work workspace  
-export NIX_HOST=work
-nix-full-rebuild
-```
-
-### Workspace-Specific Configuration
-
-**Personal-Specific** (`hosts/personal/home.nix`):
-```nix
-programs.zsh.initContent = lib.mkAfter ''
-  export PERSONAL_ENV=1
-  export NIX_HOST="personal"
-'';
-
-home.packages = with pkgs; [
-  ffmpeg
-  imagemagick
-];
-```
-
-**Work-Specific** (`hosts/work/home.nix`):
-```nix
-programs.zsh.initContent = lib.mkAfter ''
-  export WORK_ENV=1
-  export NIX_HOST="work"
-  export COMPANY_DOMAIN="work.example.com"
-'';
-```
-
-## 🔧 Advanced Customization
-
-### Adding New Workspaces
-
-To add a new workspace (e.g., "gaming"):
-
-1. **Create workspace directory**:
-```bash
-mkdir -p hosts/gaming
-```
-
-2. **Create configuration files**:
-```bash
-touch hosts/gaming/{darwin,home}.nix
-```
-
-3. **Add to flake.nix**:
-```nix
-darwinConfigurations = {
-  work = mkDarwinConfig "work";
-  personal = mkDarwinConfig "personal";
-  gaming = mkDarwinConfig "gaming";  # Add this
-};
-```
-
-4. **Configure workspace**:
-```nix
-# hosts/gaming/darwin.nix
-{ config, pkgs, lib, username, ... }:
-{
-  imports = [ ../../modules/shared/darwin.nix ];
-
-  homebrew.casks = lib.mkAfter [
-    "steam"
-    "epic-games-launcher"
-  ];
-
-  environment.variables.GAMING_ENV = lib.mkForce "1";
-}
-```
-
-### Workspace-Specific Packages
-
-Add packages to specific workspaces:
-
-**Personal workspace**:
-```nix
-# hosts/personal/home.nix
-home.packages = with pkgs; [
-  ffmpeg
-  imagemagick
-  # Personal development tools
-];
-```
-
-**Work workspace**:
-```nix
-# hosts/work/home.nix
-home.packages = with pkgs; [
-  # Work-specific tools
-  # Corporate applications
-];
-```
-
-## 📊 Configuration Statistics
-
-- **Total Nix modules**: 18+ reusable modules
-- **Host configurations**: 2 (personal, work) + extensible
-- **Service integrations**: 3 (aerospace, sketchybar, wezterm)
-- **Program configurations**: 3 (chromium, starship, zsh)
-- **Utility scripts**: 3 (package management helpers)
-- **Configuration files**: 4 (aerospace, opencode, sketchybar scripts)
-
-## 🎓 Best Practices for Extending
-
-1. **Follow the modular pattern**: Create new modules in appropriate directories
-2. **Use `mkStoreOutOfSymlink`**: For application configuration files
-3. **Document changes**: Add comments explaining non-obvious choices
-4. **Test incrementally**: Rebuild and test after each significant change
-5. **Prefer Nix packages**: Migrate from Homebrew when possible
-6. **Keep shared config minimal**: Move host-specific settings to host configs
-7. **Use `lib.mkForce`**: For environment variables and critical settings
-
-## 🔍 Troubleshooting Workspace Issues
-
-### Common Workspace Problems
-
-**Wrong workspace loaded**:
-```bash
-# Check current workspace
-echo $NIX_HOST
-
-# Switch workspace
-export NIX_HOST=personal
-# or
-NIX_HOST=personal home-manager switch --flake ~/.config/nix#personal
-```
-
-**Configuration not applying**:
-```bash
-# Force rebuild
-home-manager switch --flake ~/.config/nix#personal --show-trace
-
-# Check for errors
-journalctl -u home-manager -f
-```
-
-**Environment variables missing**:
-```bash
-# Check variables
-printenv | grep ENV
-
-# Verify shell integration
-source ~/.zshrc
-```
-
-## 📚 Additional Resources
-
-- **NixOS Manual**: https://nixos.org/manual
-- **Home Manager**: https://nix-community.github.io/home-manager
-- **Nix Darwin**: https://github.com/LnL7/nix-darwin
-- **Nix Pills**: https://nixos.org/guides/nix-pills
-- **Nix Flakes**: https://nixos.wiki/wiki/Flakes
-
-## 🤝 Community & Support
-
-While this is a personal configuration, it follows community best practices:
-- **NixOS Discourse**: https://discourse.nixos.org
-- **NixOS Wiki**: https://nixos.wiki
-- **GitHub Issues**: For specific problems with this config
-- **IRC/Matrix**: #nixos on Libera.Chat or Matrix
-
-## 📜 Version History
-
-- **2026**: Comprehensive refactoring and modernization
-- **2025**: Initial flake-based configuration
-- **2024**: Migration from ad-hoc scripts to Nix
-
-## 🙏 Acknowledgments
-
-This configuration builds upon the work of:
-- NixOS community and contributors
-- Home Manager maintainers
-- Nix Darwin developers
-- Various open-source projects and tools
-
-Special thanks to the creators of:
-- Aerospace window manager
-- Sketchybar status bar
-- Starship prompt
-- All the amazing CLI tools and applications
-
----
-
-*Configuration Type: Personal/Work Multi-Host Nix Setup*
-*Maintenance Level: Actively Maintained*
-*Documentation Status: Comprehensive*
-
-
-## 🔧 Customization
-
-### Adding New Packages
-1. Add to `modules/shared/home-manager.nix` for shared packages
-2. Add to host-specific `home.nix` for host-only packages
-3. Use `environment.systemPackages` for system-wide packages
-
-### Adding New Services
-1. Create a new module in `modules/shared/services/`
-2. Import it in the appropriate configuration
-3. Configure service-specific settings
-
-### Adding Configuration Files
-1. Place files in the `config/` directory
-2. Reference them using `lib.homeManager.mkStoreOutOfSymlink`
-3. Set appropriate permissions if needed
-
-## 📚 Documentation
-
-### File Management
-See `FILE_MANAGEMENT_GUIDE.md` for details on:
-- Using `mkStoreOutOfSymlink` for application configs
-- Managing executable scripts and permissions
-- Best practices for configuration files
-
-### Migration Guide
-See `MIGRATION_PLAN.md` for:
-- Strategies to migrate from Homebrew to Nix
-- Package-by-package migration recommendations
-- Benefits of Nix package management
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-**Flake evaluation errors**:
-```bash
-nix flake check
-nix flake update
-```
-
-**Home Manager issues**:
-```bash
-home-manager switch --flake ~/.config/nix#personal --show-trace
-```
-
-**Darwin system issues**:
-```bash
-sudo darwin-rebuild switch --flake ~/.config/nix#personal --show-trace
-```
-
-### Debugging Tips
-- Check logs in `/var/log/` for system services
-- Use `journalctl` for service logs
-- Check `~/.config/nixpkgs/home-manager/logs/` for Home Manager issues
-
-## 🤝 Contributing
-
-This configuration is designed for personal use but follows best practices that may be useful to others. Feel free to:
-- Fork and adapt for your own needs
-- Use as inspiration for your Nix configuration
-- Provide feedback or suggestions
-
-## 📜 License
-
-This configuration is provided as-is for personal use. No explicit license is specified.
-
-## 🙏 Acknowledgments
-
-- NixOS community for excellent documentation
-- Home Manager contributors for user environment management
-- Nix Darwin team for macOS support
-- Various open-source projects used in this configuration
-
----
-
-*Last updated: 2026*
-*Maintained by: System Administrator*
+- Nix itself is `nix.enable = false` because these Macs run Determinate Nix.
+- `~/.zshrc` is a symlink into the checkout, so Home Manager does not generate a second one. The zsh package is still installed.
+- `mac-app-util` keeps its own nixpkgs pin (it needs a specific SBCL and dockutil). The other inputs follow this flake's nixpkgs.
+- Personal Home Manager also installs `~/.config/sketchybar/sketchybarrc` and `workspace_update.sh` from `modules/config/sketchybar`. Those two are copies in the Nix store. SketchyBar rewrites its own config through them poorly, which is why the other dotfiles are checkout symlinks instead.
+- AeroSpace has one config, `~/.aerospace.toml`, on the laptops. The mini does not run AeroSpace.
+- `modules/config/Dracula.itermcolors` is not applied. iTerm only imports that file when you open it, and writing the preference plist would override the current profile.
+- `skills-lock.json` is a pi-agent skills lock. The flake does not read it.
+- On a Mac that already has chezmoi's copies, the first `just home` replaces those regular files (`force = true`) and leaves a backup. Then delete `~/.local/share/chezmoi` and `~/.config/chezmoi`.

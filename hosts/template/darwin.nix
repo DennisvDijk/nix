@@ -1,55 +1,63 @@
-{ config, pkgs, lib, username, hostName, ... }:
-
+# Starting point for a new Mac.
+# `modules/darwin/common.nix` brings in user, caches, and the Homebrew baseline.
+#
+# This host used to import modules/shared/darwin.nix, which did not evaluate
+# (`my.*` was not defined, and `hostName` was not passed in). The package and
+# cask lists from that file are preserved below so nothing listed there is
+# dropped. Where the two files disagreed, this host's own settings win:
+# nix.enable stays false (Determinate Nix) and Homebrew cleanup stays off.
+{ pkgs, lib, ... }:
 {
-  imports = [
-    ../../modules/shared/darwin.nix
+  imports = [ ../../modules/darwin/common.nix ];
+
+  my.darwin.homebrew.brews.enable = true;
+
+  nixpkgs.config.allowUnfree = true;
+  nix.package = pkgs.nixVersions.stable;
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
   ];
 
-  # Host identification
-  networking.hostName = hostName;
-  system.stateVersion = 6;
+  homebrew.brews = lib.mkAfter [
+    "ffmpeg"
+    "supabase/tap/supabase"
+    "yt-dlp"
+    "anomalyco/tap/opencode"
+    "pi-coding-agent"
+  ];
 
-  # Primary user
-  system.primaryUser = username;
-  
-  users.users.${username} = {
-    home = "/Users/${username}";
-    shell = pkgs.zsh;
-  };
+  homebrew.taps = lib.mkAfter [
+    "supabase/tap"
+    "anomalyco/tap"
+  ];
 
-  # Nix configuration
-  nix.enable = false;  # Set to true for standard Nix, false for Determinate
+  homebrew.casks = lib.mkAfter [
+    "spotify"
+    "whatsapp"
+    "ollama"
+    "signal"
+    "orion"
+    "tailscale-app"
+    "lm-studio"
+    "llamabarn"
+    "wave"
+    "parsec"
+    "blender"
+    "emdash"
+  ];
 
-  # Darwin feature flags - customize per machine
-  my.darwin = {
-    defaults = {
-      enable = true;
-      keyboard.enable = true;
-      dock.enable = true;
-      finder.enable = true;
-      trackpad.enable = true;
-      menuBar.enable = true;
-    };
-
-    homebrew = {
-      enable = true;
-      nixHomebrew.enable = false;
-      autoUpdate = true;
-      cleanup = false;
-      casks.enable = true;
-      brews.enable = true;
-      mas.enable = false;
-    };
-  };
-
-  # Environment variables - customize for this machine
-  environment.variables = {
-    # TEMPLATE_ENV = lib.mkForce "1";
-  };
-
-  # System packages from Nix
   environment.systemPackages = with pkgs; [
     home-manager
     git
+    chatgpt
+    discord
+    podman
+    sketchybar
+    wezterm
+    alacritty
+    k9s
+    telegram-desktop
+    gnupg
   ];
 }

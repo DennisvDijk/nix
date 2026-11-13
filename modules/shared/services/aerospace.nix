@@ -1,13 +1,6 @@
+# AeroSpace package. The config is the dotfile ~/.aerospace.toml
+# (hosts/<host>/dotfiles/home/dot_aerospace.toml), symlinked by Home Manager.
 { pkgs, ... }:
-
 {
-  environment.systemPackages = with pkgs; [
-    aerospace
-  ];
-
-  # Aerospace configuration
-  system.activationScripts.aerospace = ''
-    mkdir -p ~/.config/aerospace
-    cp ${./../../config/aerospace.toml} ~/.config/aerospace/aerospace.toml
-  '';
+  environment.systemPackages = [ pkgs.aerospace ];
 }

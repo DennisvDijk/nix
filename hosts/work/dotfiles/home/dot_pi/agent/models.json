@@ -1,4 +1,5 @@
 {
+  "$schema": "https://pi.dev/schemas/models.schema.json",
   "providers": {
     "ai-gateway": {
       "baseUrl": "https://api.ai.enexis.nl/v1",

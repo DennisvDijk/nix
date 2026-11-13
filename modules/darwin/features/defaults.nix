@@ -1,7 +1,7 @@
 # modules/darwin/features/defaults.nix
 # macOS system defaults via nix-darwin
 
-{ config, pkgs, lib, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib) mkEnableOption mkIf;
@@ -9,13 +9,25 @@ let
 in
 {
   options.my.darwin.defaults = {
-    enable = mkEnableOption "macOS system defaults" // { default = true; };
-    
-    keyboard.enable = mkEnableOption "keyboard settings" // { default = true; };
-    dock.enable = mkEnableOption "Dock settings" // { default = true; };
-    finder.enable = mkEnableOption "Finder settings" // { default = true; };
-    trackpad.enable = mkEnableOption "Trackpad settings" // { default = true; };
-    menuBar.enable = mkEnableOption "Menu bar settings" // { default = true; };
+    enable = mkEnableOption "macOS system defaults" // {
+      default = true;
+    };
+
+    keyboard.enable = mkEnableOption "keyboard settings" // {
+      default = true;
+    };
+    dock.enable = mkEnableOption "Dock settings" // {
+      default = true;
+    };
+    finder.enable = mkEnableOption "Finder settings" // {
+      default = true;
+    };
+    trackpad.enable = mkEnableOption "Trackpad settings" // {
+      default = true;
+    };
+    menuBar.enable = mkEnableOption "Menu bar settings" // {
+      default = true;
+    };
   };
 
   config = mkIf cfg.enable {
@@ -73,7 +85,7 @@ in
         TrackpadRightClick = true;
         TrackpadThreeFingerDrag = true;
       };
-      
+
       # Screensaver
       screensaver = {
         askForPassword = true;

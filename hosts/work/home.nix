@@ -1,110 +1,54 @@
 # hosts/work/home.nix
 # Work host home configuration — Enexis AI Platform
 
-{ config, pkgs, lib, inputs, username, hostName, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  username,
+  ...
+}:
 
 {
-  imports = [
-    ../../modules/shared/home-manager.nix  # Base config (core packages)
-    ../../modules/home/features             # Feature system
-  ];
+  imports = [ ../../modules/home/common.nix ];
 
-  # Host identification (provided by flake via specialArgs)
-  home.username = username;
-  home.homeDirectory = "/Users/${username}";
-  home.stateVersion = "25.05";
-
-  # Enable Home Manager
-  programs.home-manager.enable = true;
-
-  # Nix binary cache for faster builds
-  nix.settings.substituters = [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
-  nix.settings.trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
-
-  # Feature flags — full work stack for Enexis AI Platform (LiteLLM/EKS/ArgoCD/Bedrock)
+  # Enexis AI Platform. Only the overrides; module defaults cover the rest.
   my.features = {
     shell = {
-      enable = true;
-      # Work host: chezmoi owns ~/.zshrc, ~/.config/starship.toml,
-      # and ~/.config/atuin/config.toml (see hosts/work/dotfiles/home/).
-      # Disable home-manager's file generation for these to avoid conflicts;
-      # binaries are still installed via home.packages below.
+      # ~/.zshrc, starship.toml, and atuin/config.toml are checkout symlinks.
       starship.enable = false;
-      direnv.enable = true;
-      zoxide.enable = true;
       atuin.enable = false;
     };
 
-    cli.enable = true;
-
     git = {
-      enable = true;
       userName = "Dennis van Dijk";
-      userEmail = null;          # Loaded via SOPS → ~/.gitconfig.local (see activation below)
-      delta.enable = true;
-      lazygit.enable = true;
-      jujutsu.enable = true;
-      githubCli.enable = false;  # Work uses GitLab, not GitHub
-      gitlabCli.enable = true;   # Enexis: enx.gitlab.schubergphilis.com
+      userEmail = null; # SOPS writes ~/.gitconfig.local
+      githubCli.enable = false; # Work uses GitLab, not GitHub
+      gitlabCli.enable = true;
     };
 
-    terminal = {
-      enable = true;
-      wezterm.enable = true;
-      alacritty.enable = false;
-      kitty.enable = false;
-      iterm2.enable = true;
-    };
+    terminal.alacritty.enable = false;
 
-    nh = {
-      enable = true;
-      flakeDir = "${config.home.homeDirectory}/.config/nix";
-      defaultDarwinHost = "work";
-    };
+    nh.defaultDarwinHost = "work";
 
-    dev = {
-      enable = true;
-      docker.enable = true;
-      node.enable = true;
-      python.enable = true;
-      http.enable = true;
-    };
+    dev.enable = true;
 
     k8s = {
       enable = true;
-      kubectl.enable = true;
-      k9s.enable = true;
-      helm.enable = true;         # Required for ArgoCD/Kargo deployments
-      operators.enable = true;    # ArgoCD CLI, kustomize, fluxcd
-      cloud.enable = true;        # awscli2, azure-cli, sops, age — via Nix (not brew!)
+      cloud.enable = true; # awscli2, azure-cli, sops, age — via Nix, not brew
     };
 
     ai = {
       enable = true;
-      codingAssistants.enable = true;
-      llmTools.enable = true;
-      localLLMs.enable = false;   # No local LLMs on work laptop (data residency + RAM)
+      localLLMs.enable = false; # data residency + RAM
+      agentStack.enable = true;
     };
-
-    devtools.enable = false;      # Self-hosted opencode-tools stack is personal-only
   };
 
-  # Work host: chezmoi owns ~/.zshrc — disable home-manager's zsh file generation.
-  # The zsh package itself is still installed (via core packages), and plugins like
-  # autosuggestions/syntax-highlighting are sourced manually in dot_zshrc.tmpl.
-  programs.zsh.enable = lib.mkForce false;
+  my.dotfiles.root = "hosts/work/dotfiles/home";
 
-  # User identity — email loaded via SOPS, not plaintext
-  my.user = {
-    fullName = "Dennis van Dijk";
-    firstName = "Dennis";
-    lastName = "van Dijk";
-    email.personal = "dennis@thenextgen.nl";
-    email.git = "";               # Set via SOPS → gitconfig.local activation
-    email.work = "";              # Set via SOPS → gitconfig.local activation
-    username = username;
-    homeDirectory = "/Users/${username}";
-  };
+  # Git email comes from SOPS, not the personal default.
+  my.user.email.git = "";
 
   # SOPS — work secrets (email, GitLab host, API keys, tokens)
   # NOTE: add work laptop age key to .sops.yaml before first deploy on work machine
@@ -113,8 +57,8 @@
     defaultSopsFile = ../../secrets/work-secrets.yaml;
 
     secrets = {
-      work_email          = { };
-      gitlab_host         = { };
+      work_email = { };
+      gitlab_host = { };
       litellm_gateway_key = { };
       langfuse_public_key = { };
       langfuse_secret_key = { };
@@ -188,22 +132,9 @@
   #   fi
   # '';
 
-  # Activation: deploy dotfiles via chezmoi pointing to local nix repo source
-  # Dotfiles live in hosts/work/dotfiles/ — versioned together with this nix config
-  # On every run: initializes/applies chezmoi from the local source (with --force so
-  # pre-existing handwritten dotfiles get overwritten by the repo-managed versions).
-  # To update dotfiles: edit files in hosts/work/dotfiles/, then run 'chezmoi apply'
-  # (or rebuild — this activation will re-apply on every home-manager switch).
-  home.activation.chezmoiInit = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    dotfiles_source="${./dotfiles}"
-    # The selected Nix flake revision is the source of truth. This avoids
-    # silently using a stale checkout at ~/.config/nix.
-    ${pkgs.chezmoi}/bin/chezmoi --source "$dotfiles_source" apply --force
-  '';
-
   # Work-specific packages (beyond features)
   home.packages = with pkgs; [
-    # Shell (chezmoi-managed config — see programs.zsh.enable override above)
+    # Shell. ~/.zshrc is the checkout symlink, not a generated file.
     zsh
     zsh-autosuggestions
     zsh-syntax-highlighting
@@ -223,12 +154,6 @@
 
     # AWS SSM — installed via Homebrew (see hosts/work/darwin.nix)
 
-    # Dotfiles management
-    chezmoi
     duti
   ];
-
-  # Work environment variables are exported via chezmoi-managed ~/.zshrc
-  # (see hosts/work/dotfiles/home/dot_zshrc.tmpl — WORK_ENV, NIX_HOST, AWS_*).
-  # Host name and username are interpolated by chezmoi templates from ~/.config/chezmoi.
 }

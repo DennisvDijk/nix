@@ -1,0 +1,7 @@
+# Vendored dotfiles (Pi agent, OpenCode skills, …) are deployed config,
+# not the language of this repository. Without this, GitHub classifies
+# the repo as JavaScript.
+hosts/**/dotfiles/** linguist-vendored
+dotfiles/** linguist-vendored
+**/package-lock.json linguist-generated
+flake.lock linguist-generated

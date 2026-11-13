@@ -1,9 +1,0 @@
-# .chezmoiignore
-# Files in this source dir that chezmoi should NOT deploy to ~/.config/opencode/
-
-# Backup files
-*.bak
-*.backup-*
-
-# OS
-.DS_Store

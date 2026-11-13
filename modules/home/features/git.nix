@@ -1,12 +1,17 @@
 # modules/home/features/git.nix
 # Git configuration with modern tooling
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   inherit (lib) mkEnableOption mkIf mkMerge;
   cfg = config.my.features.git;
-  
+
   # Get git identity from user config
   gitEmail = if cfg.userEmail != null then cfg.userEmail else config.my.user.email.git;
   gitName = if cfg.userName != null then cfg.userName else config.my.user.fullName;
@@ -14,23 +19,31 @@ in
 {
   options.my.features.git = {
     enable = mkEnableOption "Git configuration with modern tooling";
-    
+
     userName = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
       description = "Git user name (defaults to my.user.fullName)";
     };
-    
+
     userEmail = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
       description = "Git user email (defaults to my.user.email.git)";
     };
-    
-    delta.enable = mkEnableOption "delta for git diff" // { default = true; };
-    lazygit.enable = mkEnableOption "lazygit TUI" // { default = true; };
-    jujutsu.enable = mkEnableOption "jujutsu VCS" // { default = true; };
-    githubCli.enable = mkEnableOption "GitHub CLI" // { default = true; };
+
+    delta.enable = mkEnableOption "delta for git diff" // {
+      default = true;
+    };
+    lazygit.enable = mkEnableOption "lazygit TUI" // {
+      default = true;
+    };
+    jujutsu.enable = mkEnableOption "jujutsu VCS" // {
+      default = true;
+    };
+    githubCli.enable = mkEnableOption "GitHub CLI" // {
+      default = true;
+    };
     gitlabCli.enable = mkEnableOption "GitLab CLI (glab)";
   };
 
@@ -49,20 +62,20 @@ in
         core.editor = "nvim";
         core.autocrlf = "input";
         core.fsmonitor = true;
-        
+
         # Reuse recorded resolutions for cleaner rebases
         rerere.enabled = true;
-        
+
         # Better diffs
         diff.algorithm = "histogram";
         diff.colorMoved = "zebra";
-        
+
         # Better merge
         merge.conflictstyle = "zdiff3";
-        
+
         # Better log
         log.decorate = "short";
-        
+
         # URL shortcuts — GitHub
         url."https://github.com/".insteadOf = "gh:";
         url."git@github.com:".insteadOf = "ghs:";
@@ -70,7 +83,7 @@ in
         # URL shortcuts — GitLab (SaaS only; self-hosted instance added via activation script)
         url."https://gitlab.com/".insteadOf = "gl:";
         url."git@gitlab.com:".insteadOf = "gls:";
-        
+
         # Aliases
         alias = {
           # Basic shortcuts
@@ -78,40 +91,40 @@ in
           ci = "commit";
           co = "checkout";
           br = "branch";
-          
+
           # Enhanced log views
           lg = "log --oneline --graph --decorate";
           lga = "log --oneline --graph --decorate --all";
           lgd = "log --oneline --graph --decorate --since='1 day ago'";
           lgds = "log --oneline --graph --decorate --since='1 week ago'";
-          
+
           # Better diff
           d = "diff";
           ds = "diff --staged";
           dw = "diff --word-diff";
-          
+
           # Stash operations
           ss = "stash save";
           sl = "stash list";
           sp = "stash pop";
-          
+
           # Branch management
           bm = "branch --merged";
           bnm = "branch --no-merged";
-          
+
           # Cleanup
           cleanup = "!git branch --merged | grep -v \\*\\|main\\|master\\|develop | xargs -n 1 git branch -d";
-          
+
           # Fixup commits
           fixup = "commit --fixup";
           squash = "commit --squash";
-          
+
           # Work in progress
           wip = "!git add -A && git commit -m 'WIP: temporary commit'";
           unwip = "reset HEAD~1";
         };
       };
-      
+
       ignores = [
         ".DS_Store"
         "*.swp"
@@ -148,14 +161,17 @@ in
       settings = {
         gui = {
           theme = {
-            activeBorderColor = ["#89b4fa" "bold"];
-            inactiveBorderColor = ["#a6adc8"];
-            optionsTextColor = ["#89b4fa"];
-            selectedLineBgColor = ["#313244"];
-            cherryPickedCommitBgColor = ["#45475a"];
-            cherryPickedCommitFgColor = ["#89b4fa"];
-            unstagedChangesColor = ["#f38ba8"];
-            defaultFgColor = ["#cdd6f4"];
+            activeBorderColor = [
+              "#89b4fa"
+              "bold"
+            ];
+            inactiveBorderColor = [ "#a6adc8" ];
+            optionsTextColor = [ "#89b4fa" ];
+            selectedLineBgColor = [ "#313244" ];
+            cherryPickedCommitBgColor = [ "#45475a" ];
+            cherryPickedCommitFgColor = [ "#89b4fa" ];
+            unstagedChangesColor = [ "#f38ba8" ];
+            defaultFgColor = [ "#cdd6f4" ];
           };
         };
         git = {
@@ -183,7 +199,7 @@ in
         };
       };
       extensions = with pkgs; [
-        gh-dash  # Dashboard for PRs and issues
+        gh-dash # Dashboard for PRs and issues
         # gh-copilot - removed from nixpkgs, use 'github-copilot-cli' if needed
       ];
     };
