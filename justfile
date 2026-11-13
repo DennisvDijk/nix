@@ -45,6 +45,45 @@ mini-docker-status:
 mini-pi:
     tmux new-session -A -s pi pi
 
+# Create a worktree and open pi in a new cmux workspace. Run on a laptop.
+# Usage: just agent feat/auth
+agent branch:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    wt switch --create "{{branch}}"
+    cwd="$(git worktree list --porcelain | awk -v b="{{branch}}" '
+      $1=="worktree"{p=$2}
+      $1=="branch" && $2=="refs/heads/"b {print p; exit}
+    ')"
+    if [[ -z "${cwd}" ]]; then
+      echo "No worktree found for branch {{branch}}" >&2
+      exit 1
+    fi
+    cmux new-workspace --cwd "$cwd" --command pi
+
+# List worktrunk worktrees.
+agents:
+    wt list
+
+# Remove one worktrunk worktree. Usage: just agent-remove feat/auth
+agent-remove branch:
+    wt remove "{{branch}}"
+
+# Paste stdin into the focused cmux terminal and submit it.
+steer:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cmux paste --submit
+
+# One-time: shell hook, worktrunk user config, cmux's Pi extension.
+# The shell line and config.toml are already in this repo; this refreshes
+# them from the installed cmux and wt if you want their latest generators.
+agent-setup:
+    wt config shell install
+    wt config create
+    cmux hooks setup pi
+    @echo "Pi >= 0.99.1: pi install npm:pi-worktrunk (also listed in settings.json packages)"
+
 template:
     just all template
 

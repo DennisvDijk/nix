@@ -25,6 +25,9 @@ in
     localLLMs.enable = mkEnableOption "Local LLM tools" // {
       default = true;
     };
+
+    # cmux stays a Homebrew cask. This option adds the CLI side: Pi and worktrunk.
+    agentStack.enable = mkEnableOption "Pi, worktrunk, and the cmux Pi extension";
   };
 
   config = mkIf cfg.enable {
@@ -43,6 +46,11 @@ in
           goose # Block's AI coding agent
         ]
       ))
+
+      (mkIf (cfg.codingAssistants.enable && cfg.agentStack.enable) [
+        (import ../pi-coding-agent.nix { inherit pkgs; })
+        (import ../worktrunk.nix { inherit pkgs; })
+      ])
 
       (mkIf cfg.llmTools.enable (
         with pkgs;
@@ -83,6 +91,13 @@ in
 
     # AI tool configurations
     # OpenCode's config is a symlink into the checkout (modules/home/dotfiles.nix).
+
+    # ~/.pi itself is already linked by the dotfiles module (dot_pi). Do not
+    # link auth.json or sessions. worktrunk's user config is one documented key.
+    xdg.configFile."worktrunk/config.toml" = mkIf cfg.agentStack.enable {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.my.flakePath}/modules/config/worktrunk/config.toml";
+      force = true;
+    };
     # (hosts/{personal,work}/dotfiles/home/dot_config/opencode/)
 
     # Shell aliases for AI tools

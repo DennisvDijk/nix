@@ -32,6 +32,7 @@
     };
 
     ai.enable = true;
+    ai.agentStack.enable = true;
     devtools.enable = true;
   };
 

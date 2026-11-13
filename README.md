@@ -24,6 +24,10 @@ just work
 just mac-mini         # switch the mini
 just mini-docker-status
 just mini-pi          # tmux session named pi; run on the mini
+just agent feat/auth  # wt switch --create, then cmux + pi (laptops)
+just agents           # wt list
+just agent-remove feat/auth
+just steer            # cmux paste --submit, from stdin
 just diff             # what a Darwin switch would change vs /run/current-system
 just diff-home work
 just gc               # nix-collect-garbage --delete-older-than 7d
@@ -70,6 +74,31 @@ Host files set overrides only. Feature modules own the option definitions (`lib.
 - A new toggle: add `lib.mkEnableOption` in a feature module and set it from the host.
 
 Search first: `./bin/search_package.sh <name>`.
+
+## Agent stack (personal and work)
+
+`my.features.ai.agentStack.enable` installs Pi 1.5.2 and worktrunk (`wt`) from pins in this repo. The locked nixpkgs has neither `pi-coding-agent` nor `worktrunk`. cmux stays the Homebrew cask it already was. The mini does not get this option: tmux (`just mini-pi`) already keeps a Pi session across an SSH drop, and herdr would be a second multiplexer.
+
+`~/.pi` is still the out-of-store symlink. Personal default stays `opencode-go/deepseek-v4-flash` with oMLX at `http://127.0.0.1:8000/v1`. Work stays `ai-gateway/gpt-5.6-luna`. `settings.json` adds the schema URL, `lastChangelogVersion` `1.5.2`, and `npm:pi-worktrunk`. The cmux Pi extension is the upstream hook, vendored as `~/.pi/agent/extensions/cmux-session.ts`. It no-ops outside cmux. `~/.config/worktrunk/config.toml` only sets `worktree-path`.
+
+One-time on each laptop, after `just home`:
+
+- `pi` downloads the packages listed in `settings.json`, including `pi-worktrunk`, on first launch.
+- macOS will ask for cmux's Automation permission the first time `just agent` opens a workspace.
+- `just agent-setup` re-runs `wt config shell install`, `wt config create`, and `cmux hooks setup pi` if you want the generators instead of the files in this repo. `wt config plugins pi install` is optional and not run.
+
+## Voice
+
+TypeWhisper and Handy are both installed on the laptops. TypeWhisper is the dictation front-end. There is no checked-in TypeWhisper config: the app does not document a file this repo can own. On each Mac, once:
+
+1. System Settings → Privacy & Security → Microphone, and Accessibility, allow TypeWhisper.
+2. In TypeWhisper, pick the local Parakeet TDT v3 engine for English and Dutch. Leave WhisperKit available if you want streaming.
+3. Dictate into the focused cmux pane. That is the reliable way to talk to Pi.
+4. Do not point TypeWhisper at Headroom (`:8787`) until that API is confirmed.
+
+A voice-command router (dictate vs Mac command vs new agent) is not installed. TypeWhisper workflows can call a local model, but the workflow format was not verified here, so it is not declared. To steer the focused Pi pane from a script: `just steer`. To open a new task: `just agent <branch>`.
+
+Whether Handy is redundant next to TypeWhisper is an open question. Both stay installed.
 
 ## Notes that are easy to miss
 

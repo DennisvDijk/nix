@@ -41,6 +41,7 @@
     ai = {
       enable = true;
       localLLMs.enable = false; # data residency + RAM
+      agentStack.enable = true;
     };
   };
 

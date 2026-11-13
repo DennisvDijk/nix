@@ -1,0 +1,3 @@
+# User config for worktrunk. Only keys from https://worktrunk.dev/config/ .
+# Keeps each task's worktree inside the repo.
+worktree-path = "{{ repo_path }}/.worktrees/{{ branch | sanitize }}"

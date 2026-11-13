@@ -288,6 +288,10 @@ if [ -d "$HOME/.rd/bin" ]; then
   export PATH="$HOME/.rd/bin:$PATH"
 fi
 
+# worktrunk: official zsh line from `wt config shell install` (worktrunk 0.81.0).
+# Makes `wt switch` change this shell's directory.
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
 # ============================================
 # Nix Rebuild Helper
 # ============================================

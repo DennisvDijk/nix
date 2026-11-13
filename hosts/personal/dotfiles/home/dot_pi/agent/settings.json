@@ -1,4 +1,5 @@
 {
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
   "defaultProvider": "opencode-go",
   "defaultModel": "deepseek-v4-flash",
   "defaultThinkingLevel": "high",
@@ -39,8 +40,9 @@
     "npm:@mjasnikovs/pi-task",
     "npm:pi-hermes-memory",
     "npm:remote-pi",
-    "npm:pi-tool-display"
+    "npm:pi-tool-display",
+    "npm:pi-worktrunk"
   ],
   "enableSkillCommands": true,
-  "lastChangelogVersion": "0.81.1"
+  "lastChangelogVersion": "1.5.2"
 }
